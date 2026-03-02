@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "echo '=== FILES IN (dashboard) ===' && ls -la src/app/\\(dashboard\\)/ && echo '=== TAKEN PAGE ===' && ls -la src/app/\\(dashboard\\)/taken/ 2>&1 && echo '=== IMPORT PAGE ===' && ls -la src/app/\\(dashboard\\)/import/ 2>&1 && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "db:generate": "prisma generate",
