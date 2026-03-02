@@ -14,7 +14,10 @@ import {
   Trash2,
   Hash,
   FileText,
+  Kanban,
+  ExternalLink,
 } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -57,6 +60,8 @@ import {
   ENTITY_TYPE_LABELS,
   TASK_CATEGORY_LABELS,
   TASK_CATEGORY_COLORS,
+  TASK_STATUS_LABELS,
+  TASK_STATUS_COLORS,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -479,15 +484,44 @@ export default function ClientDetailPage() {
                   (c) => !existingCategories.includes(c)
                 );
 
+                // Count tasks by status
+                const statusCounts: Record<string, number> = {};
+                (entity.tasks || []).forEach((t) => {
+                  statusCounts[t.status] = (statusCounts[t.status] || 0) + 1;
+                });
+                const totalTasks = entity.tasks?.length || 0;
+
                 return (
                   <div key={entity.id} className="rounded-lg border border-border p-4">
-                    <div className="mb-3 flex items-center gap-2">
-                      <Building2 className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-sm font-medium">{entity.name}</span>
-                      <Badge variant="secondary" className="text-xs">
-                        {ENTITY_TYPE_LABELS[entity.type] || entity.type}
-                      </Badge>
+                    <div className="mb-3 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Building2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm font-medium">{entity.name}</span>
+                        <Badge variant="secondary" className="text-xs">
+                          {ENTITY_TYPE_LABELS[entity.type] || entity.type}
+                        </Badge>
+                      </div>
+                      <Link
+                        href={`/clients/${clientId}/entities/${entity.id}`}
+                        className="flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
+                      >
+                        <Kanban className="h-3 w-3" />
+                        Kanban openen
+                        <ExternalLink className="h-3 w-3" />
+                      </Link>
                     </div>
+
+                    {/* Status overview bar */}
+                    {totalTasks > 0 && (
+                      <div className="mb-3 flex items-center gap-3 text-xs text-muted-foreground">
+                        {Object.entries(statusCounts).map(([status, count]) => (
+                          <span key={status} className={cn("flex items-center gap-1 rounded px-1.5 py-0.5", TASK_STATUS_COLORS[status])}>
+                            {TASK_STATUS_LABELS[status] || status}: {count}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
                     <div className="flex flex-wrap gap-2">
                       {Object.entries(categoryCounts).map(([cat, counts]) => (
                         <div
@@ -699,7 +733,7 @@ function EntityRow({
       className="flex items-center justify-between rounded-lg p-3 transition-colors hover:bg-muted/50"
       style={{ paddingLeft: `${12 + level * 24}px` }}
     >
-      <a
+      <Link
         href={`entities/${entity.id}`}
         className="flex flex-1 items-center gap-3"
       >
@@ -722,7 +756,7 @@ function EntityRow({
             ))}
           </div>
         </div>
-      </a>
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
