@@ -20,11 +20,16 @@ export async function GET(
     include: {
       entities: {
         include: {
-          children: true,
+          children: {
+            include: {
+              tasks: {
+                select: { id: true, category: true, status: true },
+              },
+            },
+          },
           _count: { select: { tasks: true } },
           tasks: {
-            where: { status: { not: "AFGEROND" } },
-            select: { id: true },
+            select: { id: true, category: true, status: true },
           },
         },
         orderBy: { name: "asc" },
