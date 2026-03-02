@@ -1,0 +1,256 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// TENANT (Accountantskantoor)
+// ============================================================
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  users         TenantUser[]
+  clients       Client[]
+  taskTemplates TaskTemplate[]
+
+  @@map("tenants")
+}
+
+model TenantUser {
+  id       String @id @default(cuid())
+  tenantId String @map("tenant_id")
+  userId   String @map("user_id")
+  name     String
+  email    String
+  role     String @default("member") // owner, admin, member
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@unique([tenantId, userId])
+  @@map("tenant_users")
+}
+
+// ============================================================
+// CLIENT (Relatie)
+// ============================================================
+model Client {
+  id       String     @id @default(cuid())
+  tenantId String     @map("tenant_id")
+  name     String
+  type     ClientType
+  email    String?
+  phone    String?
+  address  String?
+  zipCode  String?    @map("zip_code")
+  city     String?
+  notes    String?
+  status   ClientStatus @default(ACTIEF)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  tenant   Tenant     @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  entities Entity[]
+  contacts Contact[]
+
+  @@index([tenantId])
+  @@index([tenantId, status])
+  @@map("clients")
+}
+
+enum ClientType {
+  PARTICULIER
+  ZAKELIJK
+}
+
+enum ClientStatus {
+  ACTIEF
+  INACTIEF
+  PROSPECT
+}
+
+// ============================================================
+// ENTITY (Entiteit) - Juridische entiteiten onder een relatie
+// ============================================================
+model Entity {
+  id             String     @id @default(cuid())
+  clientId       String     @map("client_id")
+  parentEntityId String?    @map("parent_entity_id")
+  name           String
+  type           EntityType
+  kvkNumber      String?    @map("kvk_number")
+  btwNumber      String?    @map("btw_number")
+  fiscalNumber   String?    @map("fiscal_number")
+  fiscalYearEnd  String?    @map("fiscal_year_end") // e.g. "31-12" or "30-06"
+  notes          String?
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  client   Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  parent   Entity?  @relation("EntityHierarchy", fields: [parentEntityId], references: [id])
+  children Entity[] @relation("EntityHierarchy")
+  tasks    Task[]
+
+  @@index([clientId])
+  @@index([parentEntityId])
+  @@map("entities")
+}
+
+enum EntityType {
+  HOLDING
+  BV
+  VOF
+  EENMANSZAAK
+  STICHTING
+  PARTICULIER
+  MAATSCHAP
+  NV
+}
+
+// ============================================================
+// CONTACT (Contactpersoon)
+// ============================================================
+model Contact {
+  id        String  @id @default(cuid())
+  clientId  String  @map("client_id")
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  email     String?
+  phone     String?
+  role      String?
+  bsn       String? // encrypted in application layer
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tasks  Task[]
+
+  @@index([clientId])
+  @@map("contacts")
+}
+
+// ============================================================
+// TASK (Taak)
+// ============================================================
+model Task {
+  id          String       @id @default(cuid())
+  entityId    String?      @map("entity_id")
+  contactId   String?      @map("contact_id")
+  title       String
+  category    TaskCategory
+  status      TaskStatus   @default(NIET_GESTART)
+  deadline    DateTime?
+  priority    TaskPriority @default(NORMAAL)
+  recurrence  Recurrence?
+  assignedTo  String?      @map("assigned_to")
+  notes       String?
+  year        Int
+  period      String?      // Q1, Q2, januari, etc.
+  completedAt DateTime?    @map("completed_at")
+  sortOrder   Int          @default(0) @map("sort_order")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  entity  Entity?  @relation(fields: [entityId], references: [id], onDelete: Cascade)
+  contact Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  logs    TaskLog[]
+
+  @@index([entityId])
+  @@index([contactId])
+  @@index([status])
+  @@index([deadline])
+  @@map("tasks")
+}
+
+enum TaskCategory {
+  BTW
+  JAARREKENING
+  IB
+  VPB
+  LONEN
+  OVERIG
+}
+
+enum TaskStatus {
+  NIET_GESTART
+  IN_BEHANDELING
+  WACHT_OP_KLANT
+  AFGEROND
+}
+
+enum TaskPriority {
+  LAAG
+  NORMAAL
+  HOOG
+  URGENT
+}
+
+enum Recurrence {
+  MAANDELIJKS
+  PER_KWARTAAL
+  JAARLIJKS
+  EENMALIG
+}
+
+// ============================================================
+// TASK LOG (Logboek)
+// ============================================================
+model TaskLog {
+  id        String   @id @default(cuid())
+  taskId    String   @map("task_id")
+  oldStatus TaskStatus @map("old_status")
+  newStatus TaskStatus @map("new_status")
+  changedBy String   @map("changed_by")
+  note      String?
+  changedAt DateTime @default(now()) @map("changed_at")
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+  @@map("task_logs")
+}
+
+// ============================================================
+// TASK TEMPLATE (Taak-template)
+// ============================================================
+model TaskTemplate {
+  id         String     @id @default(cuid())
+  tenantId   String?    @map("tenant_id")
+  name       String
+  entityType EntityType @map("entity_type")
+  isDefault  Boolean    @default(false) @map("is_default")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  items  TaskTemplateItem[]
+
+  @@index([tenantId])
+  @@index([entityType])
+  @@map("task_templates")
+}
+
+model TaskTemplateItem {
+  id             String       @id @default(cuid())
+  templateId     String       @map("template_id")
+  title          String
+  category       TaskCategory
+  recurrence     Recurrence?
+  deadlineOffset Int?         @map("deadline_offset") // Days after period end
+  sortOrder      Int          @default(0) @map("sort_order")
+
+  template TaskTemplate @relation(fields: [templateId], references: [id], onDelete: Cascade)
+
+  @@index([templateId])
+  @@map("task_template_items")
+}
