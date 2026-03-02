@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "echo '=== CHECKING FILES ===' && ls src/app/\\(dashboard\\)/ && rm -rf .next",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
