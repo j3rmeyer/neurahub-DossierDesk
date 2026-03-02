@@ -94,6 +94,78 @@ export const DEFAULT_TEMPLATES: Record<
   },
 };
 
+// All available task definitions per category
+export const CATEGORY_TASKS: Record<string, TemplateTask[]> = {
+  BTW: [
+    { title: "BTW-aangifte Q1", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
+    { title: "BTW-aangifte Q2", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
+    { title: "BTW-aangifte Q3", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
+    { title: "BTW-aangifte Q4", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
+  ],
+  VPB: [
+    { title: "VPB-aangifte", category: "VPB", recurrence: "JAARLIJKS", deadlineOffset: null },
+  ],
+  IB: [
+    { title: "IB-aangifte", category: "IB", recurrence: "JAARLIJKS", deadlineOffset: null },
+  ],
+  JAARREKENING: [
+    { title: "Jaarrekening", category: "JAARREKENING", recurrence: "JAARLIJKS", deadlineOffset: 150 },
+    { title: "Publicatie KvK", category: "JAARREKENING", recurrence: "JAARLIJKS", deadlineOffset: 365 },
+  ],
+  LONEN: [
+    { title: "Loonheffing januari", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing februari", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing maart", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing april", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing mei", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing juni", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing juli", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing augustus", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing september", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing oktober", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing november", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "Loonheffing december", category: "LONEN", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+  ],
+};
+
+// Get suggested categories for an entity type
+export function getSuggestedCategories(entityType: string): string[] {
+  switch (entityType) {
+    case "BV":
+      return ["BTW", "VPB", "JAARREKENING", "LONEN"];
+    case "HOLDING":
+      return ["BTW", "VPB", "JAARREKENING"];
+    case "EENMANSZAAK":
+      return ["BTW", "IB", "JAARREKENING"];
+    case "VOF":
+      return ["BTW", "IB", "JAARREKENING", "LONEN"];
+    case "FAMILIE":
+    case "PARTICULIER":
+      return ["IB"];
+    case "STICHTING":
+    case "NV":
+      return ["BTW", "VPB", "JAARREKENING"];
+    case "MAATSCHAP":
+      return ["BTW", "IB", "JAARREKENING"];
+    default:
+      return [];
+  }
+}
+
+// Generate tasks for specific categories
+export function expandCategories(
+  categories: string[],
+  year: number
+): GeneratedTask[] {
+  const tasks: TemplateTask[] = [];
+  for (const cat of categories) {
+    if (CATEGORY_TASKS[cat]) {
+      tasks.push(...CATEGORY_TASKS[cat]);
+    }
+  }
+  return expandTemplate(tasks, year);
+}
+
 // Expand a template for a specific year, generating concrete tasks with deadlines
 export function expandTemplate(
   templateTasks: TemplateTask[],

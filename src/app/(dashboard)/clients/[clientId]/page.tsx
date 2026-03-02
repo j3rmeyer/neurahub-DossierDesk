@@ -36,6 +36,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import { useClient, useUpdateClient } from "@/hooks/use-clients";
 import {
   useCreateContact,
@@ -59,6 +60,8 @@ import {
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+const ALL_TAX_CATEGORIES = ["BTW", "VPB", "IB", "JAARREKENING", "LONEN"];
 
 interface ContactData {
   id: string;
@@ -89,6 +92,7 @@ interface EntityData {
 export default function ClientDetailPage() {
   const { clientId } = useParams<{ clientId: string }>();
   const { data: client, isLoading } = useClient(clientId);
+  const queryClient = useQueryClient();
   const updateClient = useUpdateClient();
   const createContact = useCreateContact(clientId);
   const updateContact = useUpdateContact(clientId);
@@ -96,6 +100,10 @@ export default function ClientDetailPage() {
   const createEntity = useCreateEntity(clientId);
   const updateEntity = useUpdateEntity(clientId);
   const deleteEntity = useDeleteEntity(clientId);
+
+  function invalidateClient() {
+    queryClient.invalidateQueries({ queryKey: ["clients", clientId] });
+  }
 
   const [editOpen, setEditOpen] = useState(false);
   const [contactFormOpen, setContactFormOpen] = useState(false);
@@ -150,24 +158,85 @@ export default function ClientDetailPage() {
   }
 
   // --- Entity handlers ---
-  async function handleCreateEntity(data: Record<string, string>) {
+  async function handleCreateEntity(data: Record<string, unknown>) {
     try {
-      await createEntity.mutateAsync(data);
+      const { categories, year, ...entityData } = data;
+      const entity = await createEntity.mutateAsync(entityData);
+
+      // Generate tasks for selected categories
+      if (
+        Array.isArray(categories) &&
+        categories.length > 0 &&
+        entity?.id
+      ) {
+        await fetch(
+          `/api/clients/${clientId}/entities/${entity.id}/tasks`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ categories, year: year || new Date().getFullYear() }),
+          }
+        );
+      }
+
       setEntityFormOpen(false);
-      toast.success("Entiteit toegevoegd");
+      toast.success("Entiteit en aangiftes toegevoegd");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Fout bij toevoegen");
     }
   }
 
-  async function handleUpdateEntity(data: Record<string, string>) {
+  async function handleUpdateEntity(data: Record<string, unknown>) {
     if (!editingEntity) return;
     try {
-      await updateEntity.mutateAsync({ id: editingEntity.id, ...data });
+      await updateEntity.mutateAsync({ id: editingEntity.id, ...data } as Record<string, unknown> & { id: string });
       setEditingEntity(null);
       toast.success("Entiteit bijgewerkt");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Fout bij bijwerken");
+    }
+  }
+
+  async function handleAddCategory(entityId: string, category: string) {
+    try {
+      const res = await fetch(
+        `/api/clients/${clientId}/entities/${entityId}/tasks`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            categories: [category],
+            year: new Date().getFullYear(),
+          }),
+        }
+      );
+      const result = await res.json();
+      if (result.created > 0) {
+        toast.success(`${TASK_CATEGORY_LABELS[category]} taken aangemaakt`);
+      } else {
+        toast.info("Deze categorie bestaat al voor dit jaar");
+      }
+      // Refetch client data
+      invalidateClient();
+    } catch {
+      toast.error("Fout bij toevoegen categorie");
+    }
+  }
+
+  async function handleRemoveCategory(entityId: string, category: string) {
+    try {
+      await fetch(
+        `/api/clients/${clientId}/entities/${entityId}/tasks`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category }),
+        }
+      );
+      toast.success(`${TASK_CATEGORY_LABELS[category]} taken verwijderd`);
+      invalidateClient();
+    } catch {
+      toast.error("Fout bij verwijderen categorie");
     }
   }
 
@@ -388,7 +457,7 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Belastingaangiftes overzicht */}
-      {allEntities.some((e) => e.tasks?.length > 0) && (
+      {allEntities.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg">Belastingaangiftes overzicht</CardTitle>
@@ -405,7 +474,10 @@ export default function ClientDetailPage() {
                   if (t.status === "AFGEROND") categoryCounts[t.category].done++;
                 });
 
-                if (Object.keys(categoryCounts).length === 0) return null;
+                const existingCategories = Object.keys(categoryCounts);
+                const availableCategories = ALL_TAX_CATEGORIES.filter(
+                  (c) => !existingCategories.includes(c)
+                );
 
                 return (
                   <div key={entity.id} className="rounded-lg border border-border p-4">
@@ -421,21 +493,50 @@ export default function ClientDetailPage() {
                         <div
                           key={cat}
                           className={cn(
-                            "flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium",
+                            "group flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium",
                             TASK_CATEGORY_COLORS[cat]
                           )}
                         >
                           <FileText className="h-3 w-3" />
                           {TASK_CATEGORY_LABELS[cat] || cat}
-                          <span className="ml-1 opacity-70">
+                          <span className="opacity-70">
                             {counts.done}/{counts.total}
                           </span>
+                          <button
+                            onClick={() => handleRemoveCategory(entity.id, cat)}
+                            className="ml-1 hidden rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100 group-hover:inline-flex"
+                            title="Verwijder deze categorie"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </button>
                         </div>
                       ))}
+                      {/* Add category dropdown */}
+                      {availableCategories.length > 0 && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <button className="flex items-center gap-1.5 rounded-md border border-dashed border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:border-foreground/30 hover:text-foreground">
+                              <Plus className="h-3 w-3" />
+                              Aangifte toevoegen
+                            </button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {availableCategories.map((cat) => (
+                              <DropdownMenuItem
+                                key={cat}
+                                onClick={() => handleAddCategory(entity.id, cat)}
+                              >
+                                <FileText className="mr-2 h-4 w-4" />
+                                {TASK_CATEGORY_LABELS[cat]}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   </div>
                 );
-              }).filter(Boolean)}
+              })}
             </div>
           </CardContent>
         </Card>
@@ -543,6 +644,7 @@ export default function ClientDetailPage() {
         )}
         loading={updateEntity.isPending}
         title="Entiteit bewerken"
+        isEdit
       />
 
       {/* Delete entity */}

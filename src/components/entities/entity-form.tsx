@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -19,12 +20,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ENTITY_TYPE_LABELS } from "@/lib/constants";
+import { ENTITY_TYPE_LABELS, TASK_CATEGORY_LABELS, TASK_CATEGORY_COLORS } from "@/lib/constants";
+import { getSuggestedCategories } from "@/lib/task-templates";
+import { cn } from "@/lib/utils";
+
+const ALL_CATEGORIES = ["BTW", "VPB", "IB", "JAARREKENING", "LONEN"] as const;
 
 interface EntityFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Record<string, string>) => Promise<void>;
+  onSubmit: (data: Record<string, unknown>) => Promise<void>;
   defaultValues?: {
     name?: string;
     type?: string;
@@ -38,6 +43,7 @@ interface EntityFormProps {
   parentEntities?: { id: string; name: string }[];
   loading?: boolean;
   title?: string;
+  isEdit?: boolean;
 }
 
 export function EntityForm({
@@ -48,6 +54,7 @@ export function EntityForm({
   parentEntities = [],
   loading,
   title = "Entiteit",
+  isEdit = false,
 }: EntityFormProps) {
   const [form, setForm] = useState({
     name: "",
@@ -59,6 +66,7 @@ export function EntityForm({
     parentEntityId: "",
     notes: "",
   });
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (defaultValues) {
@@ -72,6 +80,10 @@ export function EntityForm({
         parentEntityId: defaultValues.parentEntityId || "",
         notes: defaultValues.notes || "",
       });
+      // Don't auto-select categories when editing
+      if (isEdit) {
+        setSelectedCategories([]);
+      }
     } else {
       setForm({
         name: "",
@@ -83,20 +95,36 @@ export function EntityForm({
         parentEntityId: "",
         notes: "",
       });
+      setSelectedCategories(getSuggestedCategories("BV"));
     }
-  }, [defaultValues, open]);
+  }, [defaultValues, open, isEdit]);
+
+  // Update suggested categories when type changes (only for new entities)
+  function handleTypeChange(newType: string) {
+    setForm({ ...form, type: newType });
+    if (!isEdit) {
+      setSelectedCategories(getSuggestedCategories(newType));
+    }
+  }
+
+  function toggleCategory(cat: string) {
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const data: Record<string, string> = { ...form };
+    const data: Record<string, unknown> = { ...form };
     if (!data.parentEntityId) delete data.parentEntityId;
+    if (!isEdit) {
+      data.categories = selectedCategories;
+      data.year = new Date().getFullYear();
+    }
     await onSubmit(data);
   }
 
-  // Hide parent fields for types that don't typically have parents
   const showParent = parentEntities.length > 0;
-
-  // Show KvK/BTW for business types, not for FAMILIE/PARTICULIER
   const isBusinessType = !["FAMILIE", "PARTICULIER"].includes(form.type);
 
   return (
@@ -122,7 +150,7 @@ export function EntityForm({
               <Label>Type *</Label>
               <Select
                 value={form.type}
-                onValueChange={(v) => setForm({ ...form, type: v })}
+                onValueChange={handleTypeChange}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -213,6 +241,35 @@ export function EntityForm({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {/* Tax categories - only show when creating */}
+          {!isEdit && (
+            <div className="space-y-2">
+              <Label>Belastingaangiftes</Label>
+              <p className="text-xs text-muted-foreground">
+                Selecteer welke aangiftes aangemaakt moeten worden
+              </p>
+              <div className="grid grid-cols-2 gap-2 pt-1 sm:grid-cols-3">
+                {ALL_CATEGORIES.map((cat) => (
+                  <label
+                    key={cat}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors",
+                      selectedCategories.includes(cat)
+                        ? TASK_CATEGORY_COLORS[cat]
+                        : "border-border text-muted-foreground hover:border-foreground/20"
+                    )}
+                  >
+                    <Checkbox
+                      checked={selectedCategories.includes(cat)}
+                      onCheckedChange={() => toggleCategory(cat)}
+                    />
+                    {TASK_CATEGORY_LABELS[cat]}
+                  </label>
+                ))}
+              </div>
             </div>
           )}
 
