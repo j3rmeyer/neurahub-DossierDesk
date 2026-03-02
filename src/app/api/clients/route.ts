@@ -37,10 +37,12 @@ export async function GET(request: Request) {
         },
       },
       entities: {
-        include: {
+        select: {
+          id: true,
+          name: true,
+          type: true,
           tasks: {
-            where: { status: { not: "AFGEROND" } },
-            select: { id: true, deadline: true },
+            select: { id: true, status: true, deadline: true },
           },
         },
       },
@@ -51,17 +53,15 @@ export async function GET(request: Request) {
   // Transform to include computed fields
   const result = clients.map((client) => {
     const allTasks = client.entities.flatMap((e) => e.tasks);
-    const openTasks = allTasks.length;
+    const openTasks = allTasks.filter((t) => t.status !== "AFGEROND").length;
     const deadlines = allTasks
+      .filter((t) => t.status !== "AFGEROND")
       .map((t) => t.deadline)
       .filter((d): d is Date => d !== null)
       .sort((a, b) => a.getTime() - b.getTime());
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { entities, ...clientData } = client;
-
     return {
-      ...clientData,
+      ...client,
       openTasks,
       nextDeadline: deadlines[0] || null,
     };
