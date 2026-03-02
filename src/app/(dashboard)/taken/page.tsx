@@ -77,13 +77,14 @@ export default function TakenPage() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [clientSearch, setClientSearch] = useState("");
 
-  // Filter clients by search
+  // Filter clients by search (matches client name or entity names)
   const filteredClients = useMemo(() => {
     if (!clients) return [];
     if (!clientSearch) return clients;
     const q = clientSearch.toLowerCase();
     return clients.filter((c: ClientData) =>
-      c.name.toLowerCase().includes(q)
+      c.name.toLowerCase().includes(q) ||
+      c.entities?.some((e) => e.name.toLowerCase().includes(q))
     );
   }, [clients, clientSearch]);
 
@@ -187,7 +188,7 @@ export default function TakenPage() {
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
             <Input
-              placeholder="Zoeken..."
+              placeholder="Zoek relatie of entiteit..."
               value={clientSearch}
               onChange={(e) => setClientSearch(e.target.value)}
               className="h-8 pl-8 text-xs"
