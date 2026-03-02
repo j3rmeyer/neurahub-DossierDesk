@@ -1,0 +1,8 @@
+[build]
+builder = "nixpacks"
+
+[build.nixpacks]
+buildCmd = "ls -la src/app/\\(dashboard\\)/ && npx prisma generate && next build"
+
+[deploy]
+startCommand = "next start"
