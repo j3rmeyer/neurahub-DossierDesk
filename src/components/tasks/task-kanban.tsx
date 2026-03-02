@@ -33,13 +33,15 @@ interface Task {
   period: string | null;
   assignedTo: string | null;
   sortOrder: number;
+  [key: string]: unknown;
 }
 
 interface TaskKanbanProps {
   tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
-export function TaskKanban({ tasks }: TaskKanbanProps) {
+export function TaskKanban({ tasks, onTaskClick }: TaskKanbanProps) {
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const updateTask = useUpdateTask();
 
@@ -62,7 +64,6 @@ export function TaskKanban({ tasks }: TaskKanbanProps) {
     const taskId = active.id as string;
     const newStatus = over.id as string;
 
-    // Only update if status actually changed
     const task = tasks.find((t) => t.id === taskId);
     if (task && task.status !== newStatus && COLUMNS.some((c) => c.id === newStatus)) {
       updateTask.mutate({ id: taskId, status: newStatus });
@@ -83,6 +84,7 @@ export function TaskKanban({ tasks }: TaskKanbanProps) {
             id={column.id}
             label={column.label}
             tasks={tasks.filter((t) => t.status === column.id)}
+            onTaskClick={onTaskClick}
           />
         ))}
       </div>

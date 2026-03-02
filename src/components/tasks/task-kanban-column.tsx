@@ -15,15 +15,22 @@ interface Task {
   period: string | null;
   assignedTo: string | null;
   sortOrder: number;
+  [key: string]: unknown;
 }
 
 interface TaskKanbanColumnProps {
   id: string;
   label: string;
   tasks: Task[];
+  onTaskClick?: (task: Task) => void;
 }
 
-export function TaskKanbanColumn({ id, label, tasks }: TaskKanbanColumnProps) {
+export function TaskKanbanColumn({
+  id,
+  label,
+  tasks,
+  onTaskClick,
+}: TaskKanbanColumnProps) {
   const { setNodeRef, isOver } = useDroppable({ id });
 
   return (
@@ -45,7 +52,11 @@ export function TaskKanbanColumn({ id, label, tasks }: TaskKanbanColumnProps) {
       {/* Tasks */}
       <div className="flex flex-1 flex-col gap-2">
         {tasks.map((task) => (
-          <TaskKanbanCard key={task.id} task={task} />
+          <TaskKanbanCard
+            key={task.id}
+            task={task}
+            onClick={onTaskClick ? () => onTaskClick(task) : undefined}
+          />
         ))}
         {tasks.length === 0 && (
           <div className="flex flex-1 items-center justify-center text-xs text-muted-foreground">

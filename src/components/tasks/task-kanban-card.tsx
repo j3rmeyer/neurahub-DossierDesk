@@ -6,10 +6,9 @@ import { cn } from "@/lib/utils";
 import {
   TASK_CATEGORY_LABELS,
   TASK_CATEGORY_COLORS,
-  PRIORITY_COLORS,
 } from "@/lib/constants";
 import { getDeadlineLabel, getDeadlineColor } from "@/lib/date-utils";
-import { Calendar, AlertTriangle } from "lucide-react";
+import { Calendar, AlertTriangle, User } from "lucide-react";
 
 interface Task {
   id: string;
@@ -20,6 +19,8 @@ interface Task {
   priority: string;
   period: string | null;
   assignedTo: string | null;
+  sortOrder: number;
+  [key: string]: unknown;
 }
 
 interface TaskKanbanCardProps {
@@ -52,51 +53,53 @@ export function TaskKanbanCard({
         "cursor-grab rounded-lg border border-border bg-card p-3 shadow-sm transition-shadow hover:shadow-md",
         isDragging && "rotate-2 opacity-50 shadow-lg",
         task.priority === "URGENT" && "border-l-2 border-l-red-500",
-        task.priority === "HOOG" && "border-l-2 border-l-amber-500"
+        task.priority === "HOOG" && "border-l-2 border-l-amber-500",
+        onClick && "cursor-pointer"
       )}
     >
       {/* Title */}
       <p className="text-sm font-medium">{task.title}</p>
 
-      {/* Category badge */}
+      {/* Category badge + priority */}
       <div className="mt-2 flex flex-wrap items-center gap-2">
         <Badge
           variant="outline"
-          className={cn(
-            "text-xs",
-            TASK_CATEGORY_COLORS[task.category]
-          )}
+          className={cn("text-xs", TASK_CATEGORY_COLORS[task.category])}
         >
           {TASK_CATEGORY_LABELS[task.category] || task.category}
         </Badge>
 
-        {task.priority !== "NORMAAL" && (
-          <span
-            className={cn(
-              "text-xs",
-              PRIORITY_COLORS[task.priority]
-            )}
-          >
-            {task.priority === "URGENT" && (
-              <AlertTriangle className="inline h-3 w-3" />
-            )}
-            {task.priority === "HOOG" && "!"}
-          </span>
+        {task.priority === "URGENT" && (
+          <AlertTriangle className="h-3 w-3 text-red-600" />
+        )}
+        {task.priority === "HOOG" && (
+          <span className="text-xs font-bold text-amber-600">!</span>
         )}
       </div>
 
-      {/* Deadline */}
-      {task.deadline && (
-        <div
-          className={cn(
-            "mt-2 flex items-center gap-1 text-xs",
-            getDeadlineColor(task.deadline)
-          )}
-        >
-          <Calendar className="h-3 w-3" />
-          {getDeadlineLabel(task.deadline)}
-        </div>
-      )}
+      {/* Bottom row: deadline + assigned */}
+      <div className="mt-2 flex items-center justify-between gap-2">
+        {task.deadline ? (
+          <div
+            className={cn(
+              "flex items-center gap-1 text-xs",
+              getDeadlineColor(task.deadline)
+            )}
+          >
+            <Calendar className="h-3 w-3" />
+            {getDeadlineLabel(task.deadline)}
+          </div>
+        ) : (
+          <div />
+        )}
+
+        {task.assignedTo && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <User className="h-3 w-3" />
+            <span className="max-w-[80px] truncate">{task.assignedTo}</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams } from "next/navigation";
-import { Plus, Kanban, List, ArrowLeft } from "lucide-react";
+import { Plus, Kanban, List, ArrowLeft, Filter } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,23 +22,56 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCreateTask } from "@/hooks/use-tasks";
 import { TaskKanban } from "@/components/tasks/task-kanban";
+import { TaskListView } from "@/components/tasks/task-list-view";
+import { TaskDetailSheet } from "@/components/tasks/task-detail-sheet";
 import {
   ENTITY_TYPE_LABELS,
   TASK_CATEGORY_LABELS,
+  TASK_CATEGORY_COLORS,
   TASK_PRIORITY_LABELS,
 } from "@/lib/constants";
+import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+
+interface Task {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  deadline: string | null;
+  priority: string;
+  period: string | null;
+  assignedTo: string | null;
+  notes: string | null;
+  recurrence: string | null;
+  year: number;
+  sortOrder: number;
+  createdAt?: string;
+  completedAt?: string | null;
+  logs?: Array<{
+    id: string;
+    oldStatus: string;
+    newStatus: string;
+    changedBy: string;
+    note: string | null;
+    changedAt: string;
+  }>;
+}
 
 export default function EntityDetailPage() {
   const { clientId, entityId } = useParams<{
     clientId: string;
     entityId: string;
   }>();
+  const queryClient = useQueryClient();
   const [view, setView] = useState<"kanban" | "list">("kanban");
   const [taskFormOpen, setTaskFormOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [detailOpen, setDetailOpen] = useState(false);
 
   const { data: entity, isLoading } = useQuery({
     queryKey: ["entity", entityId],
@@ -52,6 +85,36 @@ export default function EntityDetailPage() {
   });
 
   const createTask = useCreateTask();
+
+  // Get unique categories from tasks
+  const categories: string[] = useMemo(() => {
+    if (!entity?.tasks) return [];
+    const cats = [...new Set(entity.tasks.map((t: Task) => t.category))] as string[];
+    return cats.sort();
+  }, [entity?.tasks]);
+
+  // Filter tasks by category
+  const filteredTasks = useMemo(() => {
+    if (!entity?.tasks) return [];
+    if (selectedCategory === "ALL") return entity.tasks;
+    return entity.tasks.filter(
+      (t: Task) => t.category === selectedCategory
+    );
+  }, [entity?.tasks, selectedCategory]);
+
+  function handleTaskClick(task: { id: string; [key: string]: unknown }) {
+    // Find full task from entity data
+    const fullTask = entity?.tasks?.find((t: Task) => t.id === task.id);
+    if (fullTask) {
+      setSelectedTask(fullTask);
+      setDetailOpen(true);
+    }
+  }
+
+  function handleTaskUpdated() {
+    queryClient.invalidateQueries({ queryKey: ["entity", entityId] });
+    queryClient.invalidateQueries({ queryKey: ["tasks"] });
+  }
 
   async function handleCreateTask(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -67,6 +130,7 @@ export default function EntityDetailPage() {
       });
       setTaskFormOpen(false);
       toast.success("Taak aangemaakt");
+      queryClient.invalidateQueries({ queryKey: ["entity", entityId] });
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Fout bij aanmaken"
@@ -86,6 +150,15 @@ export default function EntityDetailPage() {
   if (!entity) {
     return <p className="text-muted-foreground">Entiteit niet gevonden</p>;
   }
+
+  // Task stats
+  const totalTasks = entity.tasks?.length || 0;
+  const doneTasks = entity.tasks?.filter(
+    (t: Task) => t.status === "AFGEROND"
+  ).length || 0;
+  const inProgressTasks = entity.tasks?.filter(
+    (t: Task) => t.status === "IN_BEHANDELING"
+  ).length || 0;
 
   return (
     <div className="space-y-6">
@@ -110,6 +183,10 @@ export default function EntityDetailPage() {
                   KvK {entity.kvkNumber}
                 </span>
               )}
+              <span className="text-sm text-muted-foreground">
+                {doneTasks}/{totalTasks} afgerond
+                {inProgressTasks > 0 && ` · ${inProgressTasks} bezig`}
+              </span>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -136,16 +213,54 @@ export default function EntityDetailPage() {
         </div>
       </div>
 
-      {/* Kanban or List view */}
-      {view === "kanban" ? (
-        <TaskKanban tasks={entity.tasks || []} />
-      ) : (
-        <div className="rounded-lg border border-border bg-card p-4">
-          <p className="text-muted-foreground">
-            Lijstweergave wordt binnenkort toegevoegd
-          </p>
+      {/* Category filter tabs */}
+      {categories.length > 1 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 text-muted-foreground" />
+          <Button
+            size="sm"
+            variant={selectedCategory === "ALL" ? "default" : "outline"}
+            onClick={() => setSelectedCategory("ALL")}
+            className="text-xs"
+          >
+            Alles ({totalTasks})
+          </Button>
+          {categories.map((cat: string) => {
+            const count = entity.tasks.filter(
+              (t: Task) => t.category === cat
+            ).length;
+            return (
+              <Button
+                key={cat}
+                size="sm"
+                variant={selectedCategory === cat ? "default" : "outline"}
+                onClick={() => setSelectedCategory(cat)}
+                className={cn(
+                  "text-xs",
+                  selectedCategory !== cat && TASK_CATEGORY_COLORS[cat]
+                )}
+              >
+                {TASK_CATEGORY_LABELS[cat] || cat} ({count})
+              </Button>
+            );
+          })}
         </div>
       )}
+
+      {/* Kanban or List view */}
+      {view === "kanban" ? (
+        <TaskKanban tasks={filteredTasks} onTaskClick={handleTaskClick} />
+      ) : (
+        <TaskListView tasks={filteredTasks} onTaskClick={handleTaskClick} />
+      )}
+
+      {/* Task detail sheet */}
+      <TaskDetailSheet
+        task={selectedTask}
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        onUpdated={handleTaskUpdated}
+      />
 
       {/* Create task dialog */}
       <Dialog open={taskFormOpen} onOpenChange={setTaskFormOpen}>

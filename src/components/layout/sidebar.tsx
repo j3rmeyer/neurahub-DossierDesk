@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Users, FileText, ChevronLeft, FolderOpen } from "lucide-react";
+import { LayoutDashboard, Users, FileText, ChevronLeft, FolderOpen, Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Relaties", href: "/clients", icon: Users },
   { label: "Sjablonen", href: "/templates", icon: FileText },
+  { label: "Importeren", href: "/import", icon: Upload },
 ];
 
 export function Sidebar() {
