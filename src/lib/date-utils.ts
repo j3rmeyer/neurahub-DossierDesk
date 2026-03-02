@@ -26,9 +26,9 @@ export function getDeadlineColor(deadline: Date | string | null): string {
   const d = typeof deadline === "string" ? parseISO(deadline) : deadline;
   const daysUntil = differenceInDays(d, new Date());
 
-  if (isPast(d) && !isToday(d)) return "text-red-400";
-  if (daysUntil <= 3) return "text-orange-400";
-  if (daysUntil <= 7) return "text-amber-400";
+  if (isPast(d) && !isToday(d)) return "text-red-600";
+  if (daysUntil <= 3) return "text-orange-600";
+  if (daysUntil <= 7) return "text-amber-600";
   return "text-muted-foreground";
 }
 

@@ -84,6 +84,14 @@ export const DEFAULT_TEMPLATES: Record<
       { title: "Jaarrekening", category: "JAARREKENING", recurrence: "JAARLIJKS", deadlineOffset: 150 },
     ],
   },
+  FAMILIE: {
+    name: "Standaard Familie",
+    entityType: "FAMILIE",
+    tasks: [
+      { title: "IB-aangifte partner 1", category: "IB", recurrence: "JAARLIJKS", deadlineOffset: null },
+      { title: "IB-aangifte partner 2", category: "IB", recurrence: "JAARLIJKS", deadlineOffset: null },
+    ],
+  },
 };
 
 // Expand a template for a specific year, generating concrete tasks with deadlines

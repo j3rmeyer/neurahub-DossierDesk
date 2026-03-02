@@ -27,6 +27,7 @@ export const createEntitySchema = z.object({
     "PARTICULIER",
     "MAATSCHAP",
     "NV",
+    "FAMILIE",
   ]),
   kvkNumber: z.string().optional(),
   btwNumber: z.string().optional(),
@@ -46,6 +47,7 @@ export const createContactSchema = z.object({
   phone: z.string().optional(),
   role: z.string().optional(),
   bsn: z.string().optional(),
+  dateOfBirth: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -95,6 +97,7 @@ export const createTemplateSchema = z.object({
     "PARTICULIER",
     "MAATSCHAP",
     "NV",
+    "FAMILIE",
   ]),
   items: z.array(
     z.object({

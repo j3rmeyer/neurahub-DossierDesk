@@ -25,25 +25,29 @@ const KPI_CONFIG = [
     key: "activeClients",
     label: "Actieve relaties",
     icon: Users,
-    color: "text-blue-400",
+    color: "text-blue-600",
+    bg: "bg-blue-50",
   },
   {
     key: "openTasks",
     label: "Openstaande taken",
     icon: FileText,
-    color: "text-amber-400",
+    color: "text-amber-600",
+    bg: "bg-amber-50",
   },
   {
     key: "deadlinesThisWeek",
     label: "Deadlines deze week",
     icon: Calendar,
-    color: "text-purple-400",
+    color: "text-purple-600",
+    bg: "bg-purple-50",
   },
   {
     key: "overdueTasks",
     label: "Achterstallig",
     icon: AlertTriangle,
-    color: "text-red-400",
+    color: "text-red-600",
+    bg: "bg-red-50",
   },
 ];
 
@@ -68,7 +72,8 @@ export default function DashboardPage() {
               <CardContent className="flex items-center gap-4 p-6">
                 <div
                   className={cn(
-                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-muted",
+                    "flex h-10 w-10 shrink-0 items-center justify-center rounded-lg",
+                    kpi.bg,
                     kpi.color
                   )}
                 >

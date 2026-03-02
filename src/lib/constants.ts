@@ -20,6 +20,7 @@ export const ENTITY_TYPE_LABELS: Record<string, string> = {
   PARTICULIER: "Particulier",
   MAATSCHAP: "Maatschap",
   NV: "N.V.",
+  FAMILIE: "Familie",
 };
 
 export const TASK_CATEGORY_LABELS: Record<string, string> = {
@@ -53,26 +54,26 @@ export const RECURRENCE_LABELS: Record<string, string> = {
 };
 
 export const TASK_CATEGORY_COLORS: Record<string, string> = {
-  BTW: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  JAARREKENING: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-  IB: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  VPB: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  LONEN: "bg-pink-500/20 text-pink-400 border-pink-500/30",
-  OVERIG: "bg-gray-500/20 text-gray-400 border-gray-500/30",
+  BTW: "bg-blue-100 text-blue-700 border-blue-200",
+  JAARREKENING: "bg-purple-100 text-purple-700 border-purple-200",
+  IB: "bg-emerald-100 text-emerald-700 border-emerald-200",
+  VPB: "bg-amber-100 text-amber-700 border-amber-200",
+  LONEN: "bg-pink-100 text-pink-700 border-pink-200",
+  OVERIG: "bg-gray-100 text-gray-700 border-gray-200",
 };
 
 export const TASK_STATUS_COLORS: Record<string, string> = {
-  NIET_GESTART: "bg-status-open/20 text-blue-400",
-  IN_BEHANDELING: "bg-status-bezig/20 text-amber-400",
-  WACHT_OP_KLANT: "bg-status-wacht/20 text-orange-400",
-  AFGEROND: "bg-status-afgerond/20 text-emerald-400",
+  NIET_GESTART: "bg-blue-50 text-blue-700",
+  IN_BEHANDELING: "bg-amber-50 text-amber-700",
+  WACHT_OP_KLANT: "bg-orange-50 text-orange-700",
+  AFGEROND: "bg-emerald-50 text-emerald-700",
 };
 
 export const PRIORITY_COLORS: Record<string, string> = {
   LAAG: "text-muted-foreground",
   NORMAAL: "text-foreground",
-  HOOG: "text-amber-400",
-  URGENT: "text-red-400",
+  HOOG: "text-amber-600",
+  URGENT: "text-red-600",
 };
 
 export const NAV_ITEMS = [

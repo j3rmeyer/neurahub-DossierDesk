@@ -10,14 +10,39 @@ import {
   Phone,
   UserPlus,
   Plus,
+  MoreHorizontal,
+  Trash2,
+  Hash,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useClient, useUpdateClient } from "@/hooks/use-clients";
+import {
+  useCreateContact,
+  useUpdateContact,
+  useDeleteContact,
+} from "@/hooks/use-contacts";
 import { ClientForm } from "@/components/clients/client-form";
+import { ContactForm } from "@/components/contacts/contact-form";
 import {
   CLIENT_TYPE_LABELS,
   CLIENT_STATUS_LABELS,
@@ -25,13 +50,32 @@ import {
 } from "@/lib/constants";
 import { toast } from "sonner";
 
+interface ContactData {
+  id: string;
+  firstName: string;
+  lastName: string;
+  role: string | null;
+  email: string | null;
+  phone: string | null;
+  bsn: string | null;
+  dateOfBirth: string | null;
+  notes: string | null;
+}
+
 export default function ClientDetailPage() {
   const { clientId } = useParams<{ clientId: string }>();
   const { data: client, isLoading } = useClient(clientId);
   const updateClient = useUpdateClient();
-  const [editOpen, setEditOpen] = useState(false);
+  const createContact = useCreateContact(clientId);
+  const updateContact = useUpdateContact(clientId);
+  const deleteContact = useDeleteContact(clientId);
 
-  async function handleUpdate(data: Record<string, string>) {
+  const [editOpen, setEditOpen] = useState(false);
+  const [contactFormOpen, setContactFormOpen] = useState(false);
+  const [editingContact, setEditingContact] = useState<ContactData | null>(null);
+  const [deletingContactId, setDeletingContactId] = useState<string | null>(null);
+
+  async function handleUpdateClient(data: Record<string, string>) {
     try {
       await updateClient.mutateAsync({ id: clientId, ...data });
       setEditOpen(false);
@@ -39,6 +83,44 @@ export default function ClientDetailPage() {
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Fout bij bijwerken"
+      );
+    }
+  }
+
+  async function handleCreateContact(data: Record<string, string>) {
+    try {
+      await createContact.mutateAsync(data);
+      setContactFormOpen(false);
+      toast.success("Contactpersoon toegevoegd");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Fout bij toevoegen"
+      );
+    }
+  }
+
+  async function handleUpdateContact(data: Record<string, string>) {
+    if (!editingContact) return;
+    try {
+      await updateContact.mutateAsync({ id: editingContact.id, ...data });
+      setEditingContact(null);
+      toast.success("Contactpersoon bijgewerkt");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Fout bij bijwerken"
+      );
+    }
+  }
+
+  async function handleDeleteContact() {
+    if (!deletingContactId) return;
+    try {
+      await deleteContact.mutateAsync(deletingContactId);
+      setDeletingContactId(null);
+      toast.success("Contactpersoon verwijderd");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Fout bij verwijderen"
       );
     }
   }
@@ -129,7 +211,6 @@ export default function ClientDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {/* Build tree: show root entities, then children indented */}
                   {client.entities
                     .filter(
                       (e: { parentEntityId: string | null }) =>
@@ -181,7 +262,14 @@ export default function ClientDetailPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-lg">Contactpersonen</CardTitle>
-              <Button size="sm" variant="outline">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  setEditingContact(null);
+                  setContactFormOpen(true);
+                }}
+              >
                 <UserPlus className="mr-2 h-4 w-4" />
                 Toevoegen
               </Button>
@@ -193,38 +281,61 @@ export default function ClientDetailPage() {
                 </p>
               ) : (
                 <div className="space-y-3">
-                  {client.contacts.map(
-                    (contact: {
-                      id: string;
-                      firstName: string;
-                      lastName: string;
-                      role: string | null;
-                      email: string | null;
-                      phone: string | null;
-                    }) => (
-                      <div key={contact.id}>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <p className="text-sm font-medium">
-                              {contact.firstName} {contact.lastName}
+                  {client.contacts.map((contact: ContactData) => (
+                    <div key={contact.id}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium">
+                            {contact.firstName} {contact.lastName}
+                          </p>
+                          {contact.role && (
+                            <p className="text-xs text-muted-foreground">
+                              {contact.role}
                             </p>
-                            {contact.role && (
-                              <p className="text-xs text-muted-foreground">
-                                {contact.role}
-                              </p>
-                            )}
-                          </div>
+                          )}
                         </div>
-                        {(contact.email || contact.phone) && (
-                          <div className="mt-1 flex gap-3 text-xs text-muted-foreground">
-                            {contact.email && <span>{contact.email}</span>}
-                            {contact.phone && <span>{contact.phone}</span>}
-                          </div>
-                        )}
-                        <Separator className="mt-3" />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-8 w-8"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setEditingContact(contact)}
+                            >
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Bewerken
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="text-destructive"
+                              onClick={() =>
+                                setDeletingContactId(contact.id)
+                              }
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Verwijderen
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
-                    )
-                  )}
+                      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                        {contact.email && <span>{contact.email}</span>}
+                        {contact.phone && <span>{contact.phone}</span>}
+                        {contact.bsn && (
+                          <span className="flex items-center gap-1">
+                            <Hash className="h-3 w-3" />
+                            BSN {contact.bsn}
+                          </span>
+                        )}
+                      </div>
+                      <Separator className="mt-3" />
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
@@ -232,14 +343,71 @@ export default function ClientDetailPage() {
         </div>
       </div>
 
-      {/* Edit dialog */}
+      {/* Edit client dialog */}
       <ClientForm
         open={editOpen}
         onOpenChange={setEditOpen}
-        onSubmit={handleUpdate}
+        onSubmit={handleUpdateClient}
         defaultValues={client}
         loading={updateClient.isPending}
       />
+
+      {/* Create contact dialog */}
+      <ContactForm
+        open={contactFormOpen}
+        onOpenChange={setContactFormOpen}
+        onSubmit={handleCreateContact}
+        loading={createContact.isPending}
+        title="Contactpersoon toevoegen"
+      />
+
+      {/* Edit contact dialog */}
+      <ContactForm
+        open={!!editingContact}
+        onOpenChange={(open) => !open && setEditingContact(null)}
+        onSubmit={handleUpdateContact}
+        defaultValues={
+          editingContact
+            ? {
+                firstName: editingContact.firstName,
+                lastName: editingContact.lastName,
+                email: editingContact.email || "",
+                phone: editingContact.phone || "",
+                role: editingContact.role || "",
+                bsn: editingContact.bsn || "",
+                dateOfBirth: editingContact.dateOfBirth || "",
+                notes: editingContact.notes || "",
+              }
+            : undefined
+        }
+        loading={updateContact.isPending}
+        title="Contactpersoon bewerken"
+      />
+
+      {/* Delete confirmation */}
+      <AlertDialog
+        open={!!deletingContactId}
+        onOpenChange={(open) => !open && setDeletingContactId(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Contactpersoon verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je deze contactpersoon wilt verwijderen? Dit kan
+              niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteContact}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

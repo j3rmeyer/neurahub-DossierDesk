@@ -89,7 +89,17 @@ async function main() {
     },
   });
 
-  console.log("Created entities:", holding.name, "&", werkmaatschappij.name);
+  const familie = await prisma.entity.create({
+    data: {
+      clientId: client.id,
+      name: "Familie Meyer",
+      type: "FAMILIE",
+      fiscalYearEnd: "31-12",
+      notes: "IB-aangiftes voor Jerry en Sanne Meyer",
+    },
+  });
+
+  console.log("Created entities:", holding.name, "&", werkmaatschappij.name, "&", familie.name);
 
   // 6. Create contacts
   const jerry = await prisma.contact.create({
@@ -100,6 +110,8 @@ async function main() {
       email: "jerry@meyerit.nl",
       phone: "06-12345678",
       role: "Eigenaar / Directeur",
+      bsn: "123456789",
+      dateOfBirth: new Date("1990-03-15"),
     },
   });
 
@@ -110,6 +122,8 @@ async function main() {
       lastName: "Meyer",
       email: "sanne@meyerit.nl",
       role: "Partner",
+      bsn: "987654321",
+      dateOfBirth: new Date("1992-07-22"),
     },
   });
 
@@ -163,25 +177,24 @@ async function main() {
   }
   console.log(`Created ${bvTasks.length} tasks for ${werkmaatschappij.name}`);
 
-  // IB tasks for contacts
-  const ibTasks = expandTemplate(DEFAULT_TEMPLATES.PARTICULIER.tasks, year);
-  for (const contact of [jerry, partner]) {
-    for (const [i, task] of ibTasks.entries()) {
-      await prisma.task.create({
-        data: {
-          contactId: contact.id,
-          title: `${task.title} - ${contact.firstName} ${contact.lastName}`,
-          category: task.category as "BTW" | "JAARREKENING" | "IB" | "VPB" | "LONEN" | "OVERIG",
-          recurrence: task.recurrence as "MAANDELIJKS" | "PER_KWARTAAL" | "JAARLIJKS" | "EENMALIG" | null,
-          deadline: task.deadline,
-          year: task.year,
-          period: task.period,
-          sortOrder: i,
-        },
-      });
-    }
-    console.log(`Created IB task for ${contact.firstName} ${contact.lastName}`);
+  // Familie entity tasks (IB-aangiftes)
+  const familieTasks = expandTemplate(DEFAULT_TEMPLATES.FAMILIE.tasks, year);
+  for (const [i, task] of familieTasks.entries()) {
+    await prisma.task.create({
+      data: {
+        entityId: familie.id,
+        contactId: i === 0 ? jerry.id : partner.id,
+        title: `${task.title} - ${i === 0 ? "Jerry" : "Sanne"} Meyer`,
+        category: task.category as "BTW" | "JAARREKENING" | "IB" | "VPB" | "LONEN" | "OVERIG",
+        recurrence: task.recurrence as "MAANDELIJKS" | "PER_KWARTAAL" | "JAARLIJKS" | "EENMALIG" | null,
+        deadline: task.deadline,
+        year: task.year,
+        period: task.period,
+        sortOrder: i,
+      },
+    });
   }
+  console.log(`Created ${familieTasks.length} tasks for ${familie.name}`);
 
   console.log("\nSeeding complete!");
   console.log("Login: test@dossierdesk.nl / test123");
