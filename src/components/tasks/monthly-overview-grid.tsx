@@ -2,34 +2,36 @@
 
 import { useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
-import { BtwStatusCell } from "./btw-status-cell";
+import { TaskStatusCell } from "./task-status-cell";
 import {
   MONTH_LABELS,
   MONTH_FULL_LABELS,
   QUARTER_TO_END_MONTH,
+  TASK_CATEGORY_LABELS,
 } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type BtwTask = Record<string, any>;
+type TaskRecord = Record<string, any>;
 
 interface EntityGroup {
   entityId: string;
   entityName: string;
   clientName: string;
   recurrence: string;
-  tasks: BtwTask[];
-  taskByMonth: (BtwTask | null)[];
+  tasks: TaskRecord[];
+  taskByMonth: (TaskRecord | null)[];
 }
 
-interface BtwOverviewGridProps {
-  tasks: BtwTask[];
+interface MonthlyOverviewGridProps {
+  tasks: TaskRecord[];
   year: number;
+  category: string;
   onStatusChange: (taskId: string, newStatus: string) => void;
-  onTaskClick: (task: BtwTask) => void;
+  onTaskClick: (task: TaskRecord) => void;
 }
 
-function getMonthIndex(task: BtwTask): number | null {
+function getMonthIndex(task: TaskRecord): number | null {
   if (task.recurrence === "MAANDELIJKS" && task.period) {
     const idx = MONTH_FULL_LABELS.indexOf(task.period.toLowerCase());
     return idx >= 0 ? idx : null;
@@ -40,12 +42,16 @@ function getMonthIndex(task: BtwTask): number | null {
   return null;
 }
 
-export function BtwOverviewGrid({
+export function MonthlyOverviewGrid({
   tasks,
   year,
+  category,
   onStatusChange,
   onTaskClick,
-}: BtwOverviewGridProps) {
+}: MonthlyOverviewGridProps) {
+  // BTW has both monthly and quarterly filers, other monthly categories don't
+  const showTypeColumn = category === "BTW";
+
   const entityGroups = useMemo(() => {
     const grouped = new Map<string, EntityGroup>();
 
@@ -58,7 +64,7 @@ export function BtwOverviewGrid({
           entityId: eid,
           entityName: task.entity.name,
           clientName: task.entity.client?.name || "",
-          recurrence: task.recurrence || "PER_KWARTAAL",
+          recurrence: task.recurrence || "MAANDELIJKS",
           tasks: [],
           taskByMonth: Array(12).fill(null),
         });
@@ -80,24 +86,27 @@ export function BtwOverviewGrid({
     );
   }, [tasks, year]);
 
+  const categoryLabel = TASK_CATEGORY_LABELS[category] || category;
+
   if (entityGroups.length === 0) {
     return (
       <div className="flex flex-col items-center gap-2 py-16 text-muted-foreground">
-        <p>Geen BTW-taken gevonden voor {year}</p>
+        <p>Geen {categoryLabel.toLowerCase()}-taken gevonden voor {year}</p>
       </div>
     );
   }
 
   // Group entities by client
-  const clientGroups = useMemo(() => {
-    const groups = new Map<string, EntityGroup[]>();
-    for (const eg of entityGroups) {
-      const key = eg.clientName || "Onbekend";
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(eg);
-    }
-    return [...groups.entries()];
-  }, [entityGroups]);
+  const clientGroups: [string, EntityGroup[]][] = [];
+  const clientMap = new Map<string, EntityGroup[]>();
+  for (const eg of entityGroups) {
+    const key = eg.clientName || "Onbekend";
+    if (!clientMap.has(key)) clientMap.set(key, []);
+    clientMap.get(key)!.push(eg);
+  }
+  clientMap.forEach((entities, name) => clientGroups.push([name, entities]));
+
+  const totalCols = 12 + (showTypeColumn ? 3 : 2); // entity + (type?) + 12 months + score
 
   return (
     <div className="overflow-x-auto rounded-lg border border-border">
@@ -107,9 +116,11 @@ export function BtwOverviewGrid({
             <th className="sticky left-0 z-10 min-w-[200px] bg-muted/50 px-3 py-2 text-left text-xs font-semibold text-muted-foreground">
               Entiteit
             </th>
-            <th className="px-1 py-2 text-center text-[10px] font-medium text-muted-foreground w-10">
-              Type
-            </th>
+            {showTypeColumn && (
+              <th className="px-1 py-2 text-center text-[10px] font-medium text-muted-foreground w-10">
+                Type
+              </th>
+            )}
             {MONTH_LABELS.map((label, i) => (
               <th
                 key={i}
@@ -129,7 +140,7 @@ export function BtwOverviewGrid({
               {/* Client header row */}
               <tr key={`client-${clientName}`} className="bg-muted/30">
                 <td
-                  colSpan={15}
+                  colSpan={totalCols}
                   className="sticky left-0 z-10 bg-muted/30 px-3 py-1.5 text-xs font-semibold text-foreground"
                 >
                   {clientName}
@@ -152,19 +163,21 @@ export function BtwOverviewGrid({
                         {group.entityName}
                       </span>
                     </td>
-                    <td className="px-1 py-1.5 text-center">
-                      <Badge
-                        variant="outline"
-                        className={cn(
-                          "text-[9px] px-1 py-0",
-                          group.recurrence === "MAANDELIJKS"
-                            ? "border-blue-300 text-blue-600"
-                            : "border-violet-300 text-violet-600"
-                        )}
-                      >
-                        {group.recurrence === "MAANDELIJKS" ? "M" : "K"}
-                      </Badge>
-                    </td>
+                    {showTypeColumn && (
+                      <td className="px-1 py-1.5 text-center">
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[9px] px-1 py-0",
+                            group.recurrence === "MAANDELIJKS"
+                              ? "border-blue-300 text-blue-600"
+                              : "border-violet-300 text-violet-600"
+                          )}
+                        >
+                          {group.recurrence === "MAANDELIJKS" ? "M" : "K"}
+                        </Badge>
+                      </td>
+                    )}
                     {group.taskByMonth.map((task, monthIdx) => {
                       // For quarterly filers, show dash in non-quarter months
                       const isQuarterlyEmpty =
@@ -179,7 +192,7 @@ export function BtwOverviewGrid({
                               ·
                             </div>
                           ) : (
-                            <BtwStatusCell
+                            <TaskStatusCell
                               task={task}
                               onStatusChange={onStatusChange}
                               onTaskClick={onTaskClick}

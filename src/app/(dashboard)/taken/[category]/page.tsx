@@ -1,54 +1,56 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Search,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { useTasks, useUpdateTask } from "@/hooks/use-tasks";
 import { useQueryClient } from "@tanstack/react-query";
-import { BtwOverviewGrid } from "@/components/tasks/btw-overview-grid";
+import { MonthlyOverviewGrid } from "@/components/tasks/monthly-overview-grid";
+import { YearlyOverviewGrid } from "@/components/tasks/yearly-overview-grid";
 import { TaskDetailSheet } from "@/components/tasks/task-detail-sheet";
 import { isPast, parseISO } from "date-fns";
+import { notFound } from "next/navigation";
 
-interface TaskData {
-  id: string;
-  title: string;
-  category: string;
-  status: string;
-  deadline: string | null;
-  priority: string;
-  period: string | null;
-  assignedTo: string | null;
-  notes: string | null;
-  recurrence: string | null;
-  year: number;
-  sortOrder: number;
-  createdAt?: string;
-  completedAt?: string | null;
-  entity?: {
-    id: string;
-    name: string;
-    type?: string;
-    client?: { id: string; name: string };
-  } | null;
-  [key: string]: unknown;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type TaskData = Record<string, any>;
+
+interface CategoryConfig {
+  key: string;
+  label: string;
+  type: "monthly" | "yearly";
 }
 
-export default function BtwOverzichtPage() {
+const CATEGORY_MAP: Record<string, CategoryConfig> = {
+  btw: { key: "BTW", label: "BTW Overzicht", type: "monthly" },
+  lonen: { key: "LONEN", label: "Lonen Overzicht", type: "monthly" },
+  vpb: { key: "VPB", label: "VPB Overzicht", type: "yearly" },
+  ib: { key: "IB", label: "IB Overzicht", type: "yearly" },
+};
+
+export default function CategoryOverviewPage() {
+  const params = useParams();
+  const slug = (params.category as string)?.toLowerCase();
+  const config = CATEGORY_MAP[slug];
+
   const queryClient = useQueryClient();
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [search, setSearch] = useState("");
   const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
 
-  const { data: allTasks, isLoading } = useTasks({ category: "BTW" });
+  const { data: allTasks, isLoading } = useTasks(
+    config ? { category: config.key } : undefined
+  );
   const updateTask = useUpdateTask();
+
+  // If category doesn't exist, show 404
+  if (!config) {
+    notFound();
+  }
 
   // Filter tasks by year and search
   const filteredTasks = useMemo(() => {
@@ -60,8 +62,8 @@ export default function BtwOverzichtPage() {
       const q = search.toLowerCase();
       result = result.filter(
         (t: TaskData) =>
-          t.entity?.name.toLowerCase().includes(q) ||
-          t.entity?.client?.name.toLowerCase().includes(q)
+          t.entity?.name?.toLowerCase().includes(q) ||
+          t.entity?.client?.name?.toLowerCase().includes(q)
       );
     }
     return result;
@@ -94,9 +96,8 @@ export default function BtwOverzichtPage() {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function handleTaskClick(task: Record<string, any>) {
-    setSelectedTask(task as TaskData);
+  function handleTaskClick(task: TaskData) {
+    setSelectedTask(task);
     setDetailOpen(true);
   }
 
@@ -118,7 +119,7 @@ export default function BtwOverzichtPage() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl font-semibold">BTW Overzicht</h1>
+          <h1 className="text-xl font-semibold">{config.label}</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">
             {stats.open} open · {stats.done} afgerond
             {stats.overdue > 0 && (
@@ -165,11 +166,17 @@ export default function BtwOverzichtPage() {
           />
         </div>
         <div className="flex items-center gap-2 text-[10px] text-muted-foreground">
-          <Badge variant="outline" className="border-violet-300 text-violet-600 text-[9px] px-1 py-0">K</Badge>
-          <span>Kwartaal</span>
-          <Badge variant="outline" className="border-blue-300 text-blue-600 text-[9px] px-1 py-0">M</Badge>
-          <span>Maandelijks</span>
-          <span className="ml-2">|</span>
+          {/* Type legend only for BTW */}
+          {config.key === "BTW" && (
+            <>
+              <Badge variant="outline" className="border-violet-300 text-violet-600 text-[9px] px-1 py-0">K</Badge>
+              <span>Kwartaal</span>
+              <Badge variant="outline" className="border-blue-300 text-blue-600 text-[9px] px-1 py-0">M</Badge>
+              <span>Maandelijks</span>
+              <span className="ml-2">|</span>
+            </>
+          )}
+          {/* Status legend */}
           <div className="flex items-center gap-1 ml-1">
             <div className="h-3 w-3 rounded border bg-muted/50" />
             <span>Open</span>
@@ -193,19 +200,31 @@ export default function BtwOverzichtPage() {
         </div>
       </div>
 
-      {/* Grid */}
+      {/* Grid - monthly or yearly based on category type */}
       <div className="flex-1 overflow-auto">
-        <BtwOverviewGrid
-          tasks={filteredTasks}
-          year={selectedYear}
-          onStatusChange={handleStatusChange}
-          onTaskClick={handleTaskClick}
-        />
+        {config.type === "monthly" ? (
+          <MonthlyOverviewGrid
+            tasks={filteredTasks}
+            year={selectedYear}
+            category={config.key}
+            onStatusChange={handleStatusChange}
+            onTaskClick={handleTaskClick}
+          />
+        ) : (
+          <YearlyOverviewGrid
+            tasks={filteredTasks}
+            year={selectedYear}
+            category={config.key}
+            onStatusChange={handleStatusChange}
+            onTaskClick={handleTaskClick}
+          />
+        )}
       </div>
 
       {/* Task detail sheet */}
       <TaskDetailSheet
-        task={selectedTask}
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        task={selectedTask as any}
         open={detailOpen}
         onOpenChange={setDetailOpen}
         onUpdated={handleTaskUpdated}

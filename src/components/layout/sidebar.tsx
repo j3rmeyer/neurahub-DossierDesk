@@ -22,7 +22,10 @@ const NAV_ITEMS: NavItem[] = [
     icon: ClipboardList,
     children: [
       { label: "Alle taken", href: "/taken" },
-      { label: "BTW Overzicht", href: "/taken/btw" },
+      { label: "BTW", href: "/taken/btw" },
+      { label: "VPB", href: "/taken/vpb" },
+      { label: "IB", href: "/taken/ib" },
+      { label: "Lonen", href: "/taken/lonen" },
     ],
   },
   { label: "Sjablonen", href: "/templates", icon: FileText },

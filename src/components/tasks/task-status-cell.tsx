@@ -13,12 +13,12 @@ import { cn } from "@/lib/utils";
 import { isPast, parseISO } from "date-fns";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type BtwTask = Record<string, any>;
+type TaskRecord = Record<string, any>;
 
-interface BtwStatusCellProps {
-  task: BtwTask | null;
+interface TaskStatusCellProps {
+  task: TaskRecord | null;
   onStatusChange: (taskId: string, newStatus: string) => void;
-  onTaskClick: (task: BtwTask) => void;
+  onTaskClick: (task: TaskRecord) => void;
 }
 
 const STATUS_STYLES: Record<string, string> = {
@@ -37,7 +37,7 @@ const STATUS_ICONS: Record<string, React.ReactNode> = {
 
 const STATUSES = ["NIET_GESTART", "IN_BEHANDELING", "WACHT_OP_KLANT", "AFGEROND"];
 
-export function BtwStatusCell({ task, onStatusChange, onTaskClick }: BtwStatusCellProps) {
+export function TaskStatusCell({ task, onStatusChange, onTaskClick }: TaskStatusCellProps) {
   if (!task) {
     return (
       <div className="flex h-8 items-center justify-center text-xs text-muted-foreground/30">
