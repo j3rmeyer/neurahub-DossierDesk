@@ -76,6 +76,23 @@ export const PRIORITY_COLORS: Record<string, string> = {
   URGENT: "text-red-600",
 };
 
+export const MONTH_LABELS = [
+  "Jan", "Feb", "Mrt", "Apr", "Mei", "Jun",
+  "Jul", "Aug", "Sep", "Okt", "Nov", "Dec",
+];
+
+export const MONTH_FULL_LABELS = [
+  "januari", "februari", "maart", "april", "mei", "juni",
+  "juli", "augustus", "september", "oktober", "november", "december",
+];
+
+export const QUARTER_TO_END_MONTH: Record<string, number> = {
+  Q1: 2,  // Maart (0-indexed)
+  Q2: 5,  // Juni
+  Q3: 8,  // September
+  Q4: 11, // December
+};
+
 export const NAV_ITEMS = [
   { label: "Dashboard", href: "/dashboard", icon: "LayoutDashboard" },
   { label: "Relaties", href: "/clients", icon: "Users" },

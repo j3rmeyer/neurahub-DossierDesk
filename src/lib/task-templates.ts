@@ -1,5 +1,6 @@
 import {
   getBtwDeadline,
+  getBtwMonthlyDeadline,
   getVpbDeadline,
   getIbDeadline,
   getJaarrekeningDeadline,
@@ -102,6 +103,20 @@ export const CATEGORY_TASKS: Record<string, TemplateTask[]> = {
     { title: "BTW-aangifte Q3", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
     { title: "BTW-aangifte Q4", category: "BTW", recurrence: "PER_KWARTAAL", deadlineOffset: 30 },
   ],
+  BTW_MAANDELIJKS: [
+    { title: "BTW-aangifte januari", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte februari", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte maart", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte april", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte mei", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte juni", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte juli", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte augustus", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte september", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte oktober", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte november", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+    { title: "BTW-aangifte december", category: "BTW", recurrence: "MAANDELIJKS", deadlineOffset: 30 },
+  ],
   VPB: [
     { title: "VPB-aangifte", category: "VPB", recurrence: "JAARLIJKS", deadlineOffset: null },
   ],
@@ -174,7 +189,7 @@ export function expandTemplate(
   const tasks: GeneratedTask[] = [];
 
   for (const t of templateTasks) {
-    if (t.category === "BTW" && t.title.includes("Q")) {
+    if (t.category === "BTW" && t.recurrence === "PER_KWARTAAL" && t.title.includes("Q")) {
       const quarter = parseInt(t.title.match(/Q(\d)/)?.[1] || "0");
       if (quarter >= 1 && quarter <= 4) {
         tasks.push({
@@ -184,6 +199,24 @@ export function expandTemplate(
           deadline: getBtwDeadline(year, quarter),
           year,
           period: `Q${quarter}`,
+        });
+      }
+    } else if (t.category === "BTW" && t.recurrence === "MAANDELIJKS") {
+      const months = [
+        "januari", "februari", "maart", "april", "mei", "juni",
+        "juli", "augustus", "september", "oktober", "november", "december",
+      ];
+      const monthIdx = months.findIndex((m) =>
+        t.title.toLowerCase().includes(m)
+      );
+      if (monthIdx >= 0) {
+        tasks.push({
+          title: `${t.title} ${year}`,
+          category: t.category,
+          recurrence: t.recurrence,
+          deadline: getBtwMonthlyDeadline(year, monthIdx),
+          year,
+          period: months[monthIdx],
         });
       }
     } else if (t.category === "VPB") {

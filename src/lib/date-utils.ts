@@ -97,3 +97,9 @@ export function getLonenDeadline(year: number, month: number): Date {
   // Loonheffing: laatste dag van de volgende maand
   return endOfMonth(new Date(year, month));
 }
+
+export function getBtwMonthlyDeadline(year: number, month: number): Date {
+  // BTW maandaangifte: laatste dag van de volgende maand
+  // month is 0-based (0 = januari → deadline = eind februari)
+  return endOfMonth(new Date(year, month + 1));
+}

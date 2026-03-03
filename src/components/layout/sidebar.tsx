@@ -6,10 +6,25 @@ import { LayoutDashboard, Users, FileText, ChevronLeft, FolderOpen, Upload, Clip
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-const NAV_ITEMS = [
+interface NavItem {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  children?: { label: string; href: string }[];
+}
+
+const NAV_ITEMS: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "Relaties", href: "/clients", icon: Users },
-  { label: "Taken", href: "/taken", icon: ClipboardList },
+  {
+    label: "Taken",
+    href: "/taken",
+    icon: ClipboardList,
+    children: [
+      { label: "Alle taken", href: "/taken" },
+      { label: "BTW Overzicht", href: "/taken/btw" },
+    ],
+  },
   { label: "Sjablonen", href: "/templates", icon: FileText },
   { label: "Importeren", href: "/import", icon: Upload },
 ];
@@ -47,19 +62,43 @@ export function Sidebar() {
           const Icon = item.icon;
 
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive
-                  ? "bg-sidebar-accent text-sidebar-primary"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+            <div key={item.href}>
+              <Link
+                href={item.href}
+                className={cn(
+                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-primary"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+
+              {/* Sub-navigation */}
+              {!collapsed && item.children && isActive && (
+                <div className="ml-7 mt-0.5 space-y-0.5">
+                  {item.children.map((child) => {
+                    const isChildActive = pathname === child.href;
+                    return (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className={cn(
+                          "block rounded-md px-3 py-1.5 text-xs transition-colors",
+                          isChildActive
+                            ? "bg-sidebar-accent/50 font-medium text-sidebar-primary"
+                            : "text-muted-foreground hover:bg-sidebar-accent/30 hover:text-sidebar-foreground"
+                        )}
+                      >
+                        {child.label}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-            >
-              <Icon className="h-4 w-4 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
+            </div>
           );
         })}
       </nav>
