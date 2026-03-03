@@ -23,13 +23,13 @@ export async function GET(
           children: {
             include: {
               tasks: {
-                select: { id: true, category: true, status: true },
+                select: { id: true, category: true, status: true, recurrence: true },
               },
             },
           },
           _count: { select: { tasks: true } },
           tasks: {
-            select: { id: true, category: true, status: true },
+            select: { id: true, category: true, status: true, recurrence: true },
           },
         },
         orderBy: { name: "asc" },

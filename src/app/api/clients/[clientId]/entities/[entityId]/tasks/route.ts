@@ -7,6 +7,7 @@ import { z } from "zod";
 const generateSchema = z.object({
   categories: z.array(z.enum(["BTW", "JAARREKENING", "IB", "VPB", "LONEN"])).min(1),
   year: z.number().int(),
+  btwType: z.enum(["MAANDELIJKS", "PER_KWARTAAL"]).optional(),
 });
 
 const deleteCategorySchema = z.object({
@@ -34,7 +35,7 @@ export async function POST(
     );
   }
 
-  const { categories, year } = parsed.data;
+  const { categories, year, btwType } = parsed.data;
 
   // Check which categories already have tasks for this year
   const existingTasks = await prisma.task.findMany({
@@ -53,7 +54,7 @@ export async function POST(
     );
   }
 
-  const generatedTasks = expandCategories(newCategories, year);
+  const generatedTasks = expandCategories(newCategories, year, btwType);
 
   const tasks = await prisma.$transaction(
     generatedTasks.map((task, index) =>

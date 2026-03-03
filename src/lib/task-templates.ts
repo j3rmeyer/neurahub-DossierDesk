@@ -168,13 +168,17 @@ export function getSuggestedCategories(entityType: string): string[] {
 }
 
 // Generate tasks for specific categories
+// btwType: when "MAANDELIJKS", use monthly BTW templates instead of quarterly
 export function expandCategories(
   categories: string[],
-  year: number
+  year: number,
+  btwType?: "MAANDELIJKS" | "PER_KWARTAAL"
 ): GeneratedTask[] {
   const tasks: TemplateTask[] = [];
   for (const cat of categories) {
-    if (CATEGORY_TASKS[cat]) {
+    if (cat === "BTW" && btwType === "MAANDELIJKS") {
+      tasks.push(...CATEGORY_TASKS.BTW_MAANDELIJKS);
+    } else if (CATEGORY_TASKS[cat]) {
       tasks.push(...CATEGORY_TASKS[cat]);
     }
   }

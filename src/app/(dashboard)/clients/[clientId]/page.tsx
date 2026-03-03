@@ -16,6 +16,7 @@ import {
   FileText,
   Kanban,
   ExternalLink,
+  ArrowLeftRight,
 } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -90,7 +91,7 @@ interface EntityData {
   fiscalYearEnd: string | null;
   parentEntityId: string | null;
   notes: string | null;
-  tasks: { id: string; category: string; status: string }[];
+  tasks: { id: string; category: string; status: string; recurrence: string | null }[];
   children: EntityData[];
 }
 
@@ -242,6 +243,40 @@ export default function ClientDetailPage() {
       invalidateClient();
     } catch {
       toast.error("Fout bij verwijderen categorie");
+    }
+  }
+
+  async function handleSwitchBtwType(entityId: string, currentType: "MAANDELIJKS" | "PER_KWARTAAL") {
+    const newType = currentType === "MAANDELIJKS" ? "PER_KWARTAAL" : "MAANDELIJKS";
+    const label = newType === "MAANDELIJKS" ? "maandelijks" : "per kwartaal";
+    try {
+      // Delete existing BTW tasks
+      await fetch(
+        `/api/clients/${clientId}/entities/${entityId}/tasks`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ category: "BTW" }),
+        }
+      );
+      // Create new BTW tasks with the new type
+      await fetch(
+        `/api/clients/${clientId}/entities/${entityId}/tasks`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            categories: ["BTW"],
+            year: new Date().getFullYear(),
+            btwType: newType,
+          }),
+        }
+      );
+      toast.success(`BTW omgezet naar ${label}`);
+      invalidateClient();
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    } catch {
+      toast.error("Fout bij omzetten BTW type");
     }
   }
 
@@ -479,6 +514,13 @@ export default function ClientDetailPage() {
                   if (t.status === "AFGEROND") categoryCounts[t.category].done++;
                 });
 
+                // Detect current BTW recurrence type from tasks
+                const btwTasks = (entity.tasks || []).filter((t) => t.category === "BTW");
+                const currentBtwType: "MAANDELIJKS" | "PER_KWARTAAL" =
+                  btwTasks.some((t) => t.recurrence === "MAANDELIJKS")
+                    ? "MAANDELIJKS"
+                    : "PER_KWARTAAL";
+
                 const existingCategories = Object.keys(categoryCounts);
                 const availableCategories = ALL_TAX_CATEGORIES.filter(
                   (c) => !existingCategories.includes(c)
@@ -533,12 +575,26 @@ export default function ClientDetailPage() {
                         >
                           <FileText className="h-3 w-3" />
                           {TASK_CATEGORY_LABELS[cat] || cat}
+                          {cat === "BTW" && (
+                            <span className="opacity-60">
+                              ({currentBtwType === "MAANDELIJKS" ? "maand" : "kwartaal"})
+                            </span>
+                          )}
                           <span className="opacity-70">
                             {counts.done}/{counts.total}
                           </span>
+                          {cat === "BTW" && (
+                            <button
+                              onClick={() => handleSwitchBtwType(entity.id, currentBtwType)}
+                              className="ml-0.5 rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100"
+                              title={`Omzetten naar ${currentBtwType === "MAANDELIJKS" ? "kwartaal" : "maandelijks"}`}
+                            >
+                              <ArrowLeftRight className="h-3 w-3" />
+                            </button>
+                          )}
                           <button
                             onClick={() => handleRemoveCategory(entity.id, cat)}
-                            className="ml-1 hidden rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100 group-hover:inline-flex"
+                            className="ml-0.5 hidden rounded-full p-0.5 opacity-60 transition-opacity hover:opacity-100 group-hover:inline-flex"
                             title="Verwijder deze categorie"
                           >
                             <Trash2 className="h-3 w-3" />
