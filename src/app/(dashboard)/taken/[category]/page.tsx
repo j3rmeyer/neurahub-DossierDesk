@@ -22,10 +22,13 @@ interface CategoryConfig {
   key: string;
   label: string;
   type: "monthly" | "yearly";
+  recurrence?: "MAANDELIJKS" | "PER_KWARTAAL";
 }
 
 const CATEGORY_MAP: Record<string, CategoryConfig> = {
   btw: { key: "BTW", label: "BTW Overzicht", type: "monthly" },
+  "btw-maand": { key: "BTW", label: "BTW Maandelijks", type: "monthly", recurrence: "MAANDELIJKS" },
+  "btw-kwartaal": { key: "BTW", label: "BTW Kwartaal", type: "monthly", recurrence: "PER_KWARTAAL" },
   lonen: { key: "LONEN", label: "Lonen Overzicht", type: "monthly" },
   vpb: { key: "VPB", label: "VPB Overzicht", type: "yearly" },
   ib: { key: "IB", label: "IB Overzicht", type: "yearly" },
@@ -52,12 +55,18 @@ export default function CategoryOverviewPage() {
     notFound();
   }
 
-  // Filter tasks by year and search
+  // Filter tasks by year, recurrence, and search
   const filteredTasks = useMemo(() => {
     if (!allTasks) return [];
     let result = allTasks.filter(
       (t: TaskData) => t.year === selectedYear
     );
+    // Filter by recurrence type if specified (e.g. btw-maand vs btw-kwartaal)
+    if (config.recurrence) {
+      result = result.filter(
+        (t: TaskData) => t.recurrence === config.recurrence
+      );
+    }
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -67,7 +76,7 @@ export default function CategoryOverviewPage() {
       );
     }
     return result;
-  }, [allTasks, selectedYear, search]);
+  }, [allTasks, selectedYear, search, config.recurrence]);
 
   // Stats
   const stats = useMemo(() => {
