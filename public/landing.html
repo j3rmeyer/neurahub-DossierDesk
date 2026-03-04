@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="nl" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DossierDesk — Grip op je praktijk</title>
+  <meta name="description" content="Relatiebeheer, takenbeheer en deadlinetracking voor accountants — in één overzichtelijk platform." />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { 900: '#0B1120', 800: '#0F172A', 700: '#1E293B', 600: '#334155' },
+            accent: { DEFAULT: '#10B981', light: '#34D399', dark: '#059669' },
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .gradient-text {
+      background: linear-gradient(135deg, #10B981, #34D399, #6EE7B7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .card-glow:hover {
+      box-shadow: 0 0 40px rgba(16, 185, 129, 0.08);
+    }
+    .hero-glow {
+      background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(16, 185, 129, 0.12), transparent);
+    }
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .tree-line {
+      border-left: 2px solid #334155;
+    }
+  </style>
+</head>
+<body class="bg-navy-900 text-gray-300 antialiased">
+
+  <!-- Header -->
+  <header id="header" class="fixed top-0 left-0 right-0 z-50 border-b border-white/5 bg-navy-900/80 backdrop-blur-xl transition-all">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <a href="#" class="flex items-center gap-2.5">
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-white">
+          <i data-lucide="folder-open" class="h-4 w-4"></i>
+        </div>
+        <span class="text-lg font-bold text-white">DossierDesk</span>
+      </a>
+      <nav class="hidden items-center gap-8 md:flex">
+        <a href="#features" class="text-sm text-gray-400 transition hover:text-white">Features</a>
+        <a href="#voorbeeld" class="text-sm text-gray-400 transition hover:text-white">Hoe het werkt</a>
+        <a href="#pricing" class="text-sm text-gray-400 transition hover:text-white">Prijzen</a>
+        <a href="#faq" class="text-sm text-gray-400 transition hover:text-white">FAQ</a>
+      </nav>
+      <div class="flex items-center gap-3">
+        <a href="/auth/login" class="hidden text-sm font-medium text-gray-300 transition hover:text-white sm:block">Inloggen</a>
+        <a href="#pricing" class="rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-dark">
+          Gratis proberen
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero-glow relative overflow-hidden pt-32 pb-20 md:pt-44 md:pb-32">
+    <div class="mx-auto max-w-4xl px-6 text-center">
+      <div class="mb-6 inline-flex items-center gap-2 rounded-full border border-accent/20 bg-accent/5 px-4 py-1.5 text-xs font-medium text-accent-light">
+        <i data-lucide="sparkles" class="h-3.5 w-3.5"></i>
+        Gebouwd voor accountants, door accountants
+      </div>
+      <h1 class="text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl">
+        Grip op je <span class="gradient-text">praktijk</span>
+      </h1>
+      <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-400 md:text-xl">
+        Alle klanten, entiteiten en deadlines in één overzicht. Nooit meer een BTW-aangifte of jaarrekening over het hoofd zien.
+      </p>
+      <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <a href="#pricing" class="inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-dark hover:shadow-accent/30">
+          Start 14 dagen gratis
+          <i data-lucide="arrow-right" class="h-4 w-4"></i>
+        </a>
+        <a href="#voorbeeld" class="inline-flex items-center gap-2 rounded-xl border border-white/10 px-8 py-3.5 text-base font-medium text-gray-300 transition hover:border-white/20 hover:text-white">
+          <i data-lucide="play-circle" class="h-4 w-4"></i>
+          Bekijk demo
+        </a>
+      </div>
+    </div>
+
+    <!-- Abstract dashboard mockup -->
+    <div class="mx-auto mt-16 max-w-5xl px-6">
+      <div class="rounded-2xl border border-white/10 bg-navy-800/60 p-1 shadow-2xl backdrop-blur">
+        <div class="rounded-xl bg-navy-800 p-6">
+          <!-- Mock top bar -->
+          <div class="mb-4 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="h-3 w-3 rounded-full bg-red-500/60"></div>
+              <div class="h-3 w-3 rounded-full bg-yellow-500/60"></div>
+              <div class="h-3 w-3 rounded-full bg-green-500/60"></div>
+            </div>
+            <div class="h-6 w-48 rounded bg-navy-700"></div>
+            <div class="h-6 w-6 rounded bg-navy-700"></div>
+          </div>
+          <!-- Mock content -->
+          <div class="flex gap-4">
+            <!-- Sidebar -->
+            <div class="hidden w-44 space-y-2 sm:block">
+              <div class="h-8 rounded bg-accent/10 border border-accent/20"></div>
+              <div class="h-7 rounded bg-navy-700"></div>
+              <div class="h-7 rounded bg-navy-700"></div>
+              <div class="h-7 rounded bg-navy-700"></div>
+              <div class="h-7 rounded bg-navy-700"></div>
+            </div>
+            <!-- Main -->
+            <div class="flex-1 space-y-3">
+              <div class="flex gap-3">
+                <div class="h-20 flex-1 rounded-lg bg-accent/10 border border-accent/20"></div>
+                <div class="h-20 flex-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20"></div>
+                <div class="h-20 flex-1 rounded-lg bg-red-500/10 border border-red-500/20"></div>
+              </div>
+              <div class="grid grid-cols-4 gap-2">
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-accent/20"></div>
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-accent/20"></div>
+                <div class="h-10 rounded bg-accent/20"></div>
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-yellow-500/20"></div>
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-accent/20"></div>
+                <div class="h-10 rounded bg-navy-700"></div>
+                <div class="h-10 rounded bg-red-500/20"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pain points -->
+  <section class="py-20 md:py-28">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white md:text-4xl">Herkenbaar?</h2>
+        <p class="mt-3 text-gray-400">De dagelijkse uitdagingen van elk accountantskantoor.</p>
+      </div>
+      <div class="mt-14 grid gap-8 md:grid-cols-3">
+        <!-- Pain 1 -->
+        <div class="fade-in rounded-2xl border border-white/5 bg-navy-800/50 p-8 transition card-glow">
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10 text-red-400">
+            <i data-lucide="table" class="h-6 w-6"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white">Excel-lijsten die niemand bijhoudt</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Deadlines die vergeten worden, taken die tussen wal en schip vallen, en een inbox vol herinneringen aan jezelf.
+          </p>
+        </div>
+        <!-- Pain 2 -->
+        <div class="fade-in rounded-2xl border border-white/5 bg-navy-800/50 p-8 transition card-glow" style="transition-delay: 0.1s">
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-500/10 text-yellow-400">
+            <i data-lucide="eye-off" class="h-6 w-6"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white">Geen overzicht over je klantportfolio</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Welke jaarrekening is af? Welke BTW loopt achter? Je weet het pas als het te laat is.
+          </p>
+        </div>
+        <!-- Pain 3 -->
+        <div class="fade-in rounded-2xl border border-white/5 bg-navy-800/50 p-8 transition card-glow" style="transition-delay: 0.2s">
+          <div class="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400">
+            <i data-lucide="trending-up" class="h-6 w-6"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-white">Groeiend kantoor, groeiende chaos</h3>
+          <p class="mt-3 text-sm leading-relaxed text-gray-400">
+            Meer klanten, meer entiteiten, meer deadlines. Maar je werkwijze schaalt niet mee.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="py-20 md:py-28">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white md:text-4xl">
+          Alles wat je nodig hebt.<br class="hidden sm:block" />
+          <span class="text-gray-500">Niets wat je niet nodig hebt.</span>
+        </h2>
+      </div>
+
+      <div class="mt-16 space-y-20">
+        <!-- Feature 1 -->
+        <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
+          <div class="flex-1">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              <i data-lucide="users" class="h-3.5 w-3.5"></i>
+              Relatiebeheer
+            </div>
+            <h3 class="text-2xl font-bold text-white">Relatiebeheer met structuur</h3>
+            <p class="mt-3 leading-relaxed text-gray-400">
+              Organiseer klanten met hun holdings, werkmaatschappijen en contactpersonen in een overzichtelijke boomstructuur. Alle klantgegevens, KvK, BTW-nummers en contactpersonen op één plek.
+            </p>
+          </div>
+          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
+            <div class="space-y-3">
+              <div class="flex items-center gap-3 rounded-lg bg-navy-700/50 px-4 py-3">
+                <i data-lucide="building-2" class="h-4 w-4 text-accent"></i>
+                <span class="text-sm font-medium text-white">Meyer Holding</span>
+                <span class="ml-auto rounded bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">Zakelijk</span>
+              </div>
+              <div class="ml-6 space-y-2">
+                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
+                  <i data-lucide="building" class="h-3.5 w-3.5 text-blue-400"></i>
+                  <span class="text-xs text-gray-300">MeyerIT Holding BV</span>
+                </div>
+                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
+                  <i data-lucide="building" class="h-3.5 w-3.5 text-blue-400"></i>
+                  <span class="text-xs text-gray-300">MeyerIT BV</span>
+                </div>
+                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
+                  <i data-lucide="user" class="h-3.5 w-3.5 text-purple-400"></i>
+                  <span class="text-xs text-gray-300">Jerry Meyer</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="fade-in flex flex-col items-center gap-10 md:flex-row-reverse">
+          <div class="flex-1">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
+              <i data-lucide="kanban" class="h-3.5 w-3.5"></i>
+              Takenbeheer
+            </div>
+            <h3 class="text-2xl font-bold text-white">Slim takenbeheer</h3>
+            <p class="mt-3 leading-relaxed text-gray-400">
+              Kanban-board of lijstweergave — jij kiest. Statussen: Niet gestart, In behandeling, Wacht op klant, Afgerond. Drag en drop om taken te verplaatsen. Elke taak gekoppeld aan de juiste entiteit.
+            </p>
+          </div>
+          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
+            <div class="flex gap-3">
+              <div class="flex-1 space-y-2">
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Open</div>
+                <div class="rounded-lg border border-white/5 bg-navy-700/50 p-3">
+                  <div class="text-xs font-medium text-white">BTW Q2</div>
+                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
+                </div>
+                <div class="rounded-lg border border-white/5 bg-navy-700/50 p-3">
+                  <div class="text-xs font-medium text-white">VPB 2025</div>
+                  <div class="mt-1 text-[10px] text-gray-500">Holding BV</div>
+                </div>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Bezig</div>
+                <div class="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
+                  <div class="text-xs font-medium text-white">Jaarrekening</div>
+                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
+                </div>
+              </div>
+              <div class="flex-1 space-y-2">
+                <div class="text-[10px] font-semibold uppercase tracking-wider text-accent">Klaar</div>
+                <div class="rounded-lg border border-accent/20 bg-accent/5 p-3">
+                  <div class="text-xs font-medium text-white">BTW Q1</div>
+                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
+          <div class="flex-1">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-400">
+              <i data-lucide="zap" class="h-3.5 w-3.5"></i>
+              Templates
+            </div>
+            <h3 class="text-2xl font-bold text-white">Automatische taak-templates</h3>
+            <p class="mt-3 leading-relaxed text-gray-400">
+              Nieuwe BV aangemaakt? Alle taken staan er direct: BTW (4x), jaarrekening, VPB, loonheffing. Templates voor BV, Holding, Eenmanszaak, Particulier. Pas aan naar jouw werkwijze.
+            </p>
+          </div>
+          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
+            <div class="mb-3 text-xs font-medium text-gray-400">Template: Standaard BV</div>
+            <div class="space-y-2">
+              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
+                <div class="h-2 w-2 rounded-full bg-blue-400"></div>
+                <span class="text-xs text-gray-300">BTW Q1-Q4</span>
+                <span class="ml-auto text-[10px] text-gray-500">4 taken</span>
+              </div>
+              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
+                <div class="h-2 w-2 rounded-full bg-purple-400"></div>
+                <span class="text-xs text-gray-300">Jaarrekening</span>
+                <span class="ml-auto text-[10px] text-gray-500">1 taak</span>
+              </div>
+              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
+                <div class="h-2 w-2 rounded-full bg-amber-400"></div>
+                <span class="text-xs text-gray-300">VPB-aangifte</span>
+                <span class="ml-auto text-[10px] text-gray-500">1 taak</span>
+              </div>
+              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
+                <div class="h-2 w-2 rounded-full bg-pink-400"></div>
+                <span class="text-xs text-gray-300">Loonheffing jan-dec</span>
+                <span class="ml-auto text-[10px] text-gray-500">12 taken</span>
+              </div>
+            </div>
+            <div class="mt-3 flex items-center gap-1 text-[10px] text-accent">
+              <i data-lucide="zap" class="h-3 w-3"></i>
+              18 taken automatisch aangemaakt
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="fade-in flex flex-col items-center gap-10 md:flex-row-reverse">
+          <div class="flex-1">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-400">
+              <i data-lucide="bar-chart-3" class="h-3.5 w-3.5"></i>
+              Dashboard
+            </div>
+            <h3 class="text-2xl font-bold text-white">Deadline dashboard</h3>
+            <p class="mt-3 leading-relaxed text-gray-400">
+              Eén scherm met alles wat aandacht nodig heeft. Kleurcodering: groen (op schema), oranje (deze week), rood (achterstallig). Filter per categorie. Nooit meer een deadline missen.
+            </p>
+          </div>
+          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
+            <div class="grid grid-cols-3 gap-3">
+              <div class="rounded-lg bg-accent/10 p-3 text-center">
+                <div class="text-2xl font-bold text-accent">24</div>
+                <div class="text-[10px] text-gray-400">Op schema</div>
+              </div>
+              <div class="rounded-lg bg-yellow-500/10 p-3 text-center">
+                <div class="text-2xl font-bold text-yellow-400">7</div>
+                <div class="text-[10px] text-gray-400">Deze week</div>
+              </div>
+              <div class="rounded-lg bg-red-500/10 p-3 text-center">
+                <div class="text-2xl font-bold text-red-400">2</div>
+                <div class="text-[10px] text-gray-400">Achterstallig</div>
+              </div>
+            </div>
+            <div class="mt-4 space-y-2">
+              <div class="flex items-center gap-2 text-xs">
+                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
+                  <div class="h-1.5 w-3/4 rounded-full bg-accent"></div>
+                </div>
+                <span class="text-gray-400">BTW 75%</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
+                  <div class="h-1.5 w-1/2 rounded-full bg-yellow-400"></div>
+                </div>
+                <span class="text-gray-400">VPB 50%</span>
+              </div>
+              <div class="flex items-center gap-2 text-xs">
+                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
+                  <div class="h-1.5 w-1/3 rounded-full bg-purple-400"></div>
+                </div>
+                <span class="text-gray-400">Jaarrekening 33%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
+          <div class="flex-1">
+            <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400">
+              <i data-lucide="history" class="h-3.5 w-3.5"></i>
+              Audit trail
+            </div>
+            <h3 class="text-2xl font-bold text-white">Compleet logboek</h3>
+            <p class="mt-3 leading-relaxed text-gray-400">
+              Wie heeft wanneer wat gedaan? Automatisch vastgelegd. Statuswijzigingen, notities, toewijzingen — alles traceerbaar.
+            </p>
+          </div>
+          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
+            <div class="space-y-4">
+              <div class="flex gap-3">
+                <div class="mt-0.5 h-2 w-2 rounded-full bg-accent"></div>
+                <div>
+                  <div class="text-xs text-white">Status gewijzigd naar <span class="font-medium text-accent">Afgerond</span></div>
+                  <div class="text-[10px] text-gray-500">Jerry Meyer &middot; vandaag 14:32</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="mt-0.5 h-2 w-2 rounded-full bg-amber-400"></div>
+                <div>
+                  <div class="text-xs text-white">Toegewezen aan <span class="font-medium text-amber-400">Lisa de Vries</span></div>
+                  <div class="text-[10px] text-gray-500">Jerry Meyer &middot; vandaag 10:15</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="mt-0.5 h-2 w-2 rounded-full bg-blue-400"></div>
+                <div>
+                  <div class="text-xs text-white">Status gewijzigd naar <span class="font-medium text-blue-400">In behandeling</span></div>
+                  <div class="text-[10px] text-gray-500">Lisa de Vries &middot; gisteren 16:45</div>
+                </div>
+              </div>
+              <div class="flex gap-3">
+                <div class="mt-0.5 h-2 w-2 rounded-full bg-gray-500"></div>
+                <div>
+                  <div class="text-xs text-white">Taak aangemaakt via template</div>
+                  <div class="text-[10px] text-gray-500">Systeem &middot; 15 jan 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example -->
+  <section id="voorbeeld" class="py-20 md:py-28">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white md:text-4xl">Zo werkt het in de praktijk</h2>
+        <p class="mx-auto mt-3 max-w-xl text-gray-400">
+          In één oogopslag zie je de volledige structuur van je klant. Holdings, werkmaatschappijen, privépersonen — elk met hun eigen taken en deadlines.
+        </p>
+      </div>
+
+      <div class="fade-in mx-auto mt-14 max-w-3xl rounded-2xl border border-white/5 bg-navy-800/50 p-8">
+        <!-- Client -->
+        <div class="flex items-center gap-3 mb-6">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
+            <i data-lucide="building-2" class="h-5 w-5"></i>
+          </div>
+          <div>
+            <div class="text-base font-semibold text-white">Meyer Holding</div>
+            <div class="text-xs text-gray-500">Zakelijk &middot; 4 entiteiten &middot; 22 taken</div>
+          </div>
+        </div>
+
+        <div class="ml-5 space-y-4">
+          <!-- Entity 1 -->
+          <div class="tree-line pl-6">
+            <div class="flex items-center gap-3 mb-2">
+              <i data-lucide="building" class="h-4 w-4 text-blue-400"></i>
+              <span class="text-sm font-medium text-white">MeyerIT Holding BV</span>
+              <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Holding</span>
+            </div>
+            <div class="ml-7 flex flex-wrap gap-2">
+              <span class="rounded border border-blue-500/20 bg-blue-500/5 px-2 py-1 text-[10px] text-blue-400">BTW Q1-Q4</span>
+              <span class="rounded border border-purple-500/20 bg-purple-500/5 px-2 py-1 text-[10px] text-purple-400">Jaarrekening 2025</span>
+              <span class="rounded border border-amber-500/20 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-400">VPB 2025</span>
+            </div>
+          </div>
+
+          <!-- Entity 2 -->
+          <div class="tree-line pl-6">
+            <div class="flex items-center gap-3 mb-2">
+              <i data-lucide="building" class="h-4 w-4 text-blue-400"></i>
+              <span class="text-sm font-medium text-white">MeyerIT BV</span>
+              <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Werkmaatschappij</span>
+            </div>
+            <div class="ml-7 flex flex-wrap gap-2">
+              <span class="rounded border border-blue-500/20 bg-blue-500/5 px-2 py-1 text-[10px] text-blue-400">BTW Q1-Q4</span>
+              <span class="rounded border border-purple-500/20 bg-purple-500/5 px-2 py-1 text-[10px] text-purple-400">Jaarrekening 2025</span>
+              <span class="rounded border border-amber-500/20 bg-amber-500/5 px-2 py-1 text-[10px] text-amber-400">VPB 2025</span>
+              <span class="rounded border border-pink-500/20 bg-pink-500/5 px-2 py-1 text-[10px] text-pink-400">Loonheffing jan-dec</span>
+            </div>
+          </div>
+
+          <!-- Entity 3 -->
+          <div class="tree-line pl-6">
+            <div class="flex items-center gap-3 mb-2">
+              <i data-lucide="user" class="h-4 w-4 text-purple-400"></i>
+              <span class="text-sm font-medium text-white">Jerry Meyer</span>
+              <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Eigenaar</span>
+            </div>
+            <div class="ml-7 flex flex-wrap gap-2">
+              <span class="rounded border border-emerald-500/20 bg-emerald-500/5 px-2 py-1 text-[10px] text-emerald-400">IB-aangifte 2025</span>
+            </div>
+          </div>
+
+          <!-- Entity 4 -->
+          <div class="pl-6">
+            <div class="flex items-center gap-3 mb-2">
+              <i data-lucide="user" class="h-4 w-4 text-purple-400"></i>
+              <span class="text-sm font-medium text-white">Partner Meyer</span>
+              <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Partner</span>
+            </div>
+            <div class="ml-7 flex flex-wrap gap-2">
+              <span class="rounded border border-emerald-500/20 bg-emerald-500/5 px-2 py-1 text-[10px] text-emerald-400">IB-aangifte 2025</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20 md:py-28">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white md:text-4xl">Eenvoudige, transparante prijzen</h2>
+        <p class="mt-3 text-gray-400">Geen verrassingen. Geen verborgen kosten.</p>
+      </div>
+
+      <div class="mt-14 grid gap-6 md:grid-cols-3">
+        <!-- Starter -->
+        <div class="fade-in rounded-2xl border border-white/5 bg-navy-800/50 p-8 transition card-glow">
+          <div class="text-sm font-medium text-gray-400">Starter</div>
+          <div class="mt-3 flex items-baseline gap-1">
+            <span class="text-4xl font-bold text-white">&euro;39</span>
+            <span class="text-sm text-gray-500">/maand per gebruiker</span>
+          </div>
+          <ul class="mt-8 space-y-3">
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Tot 50 relaties
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Onbeperkt entiteiten en contacten
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Takenbeheer met kanban en lijstweergave
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Standaard taak-templates
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Dashboard met deadline-overzicht
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Email support
+            </li>
+          </ul>
+          <a href="mailto:info@dossierdesk.nl?subject=Gratis proefperiode - Starter" class="mt-8 block rounded-xl border border-white/10 py-3 text-center text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/5">
+            Start gratis proefperiode
+          </a>
+        </div>
+
+        <!-- Professional -->
+        <div class="fade-in relative rounded-2xl border-2 border-accent/30 bg-navy-800/50 p-8 transition card-glow" style="transition-delay: 0.1s">
+          <div class="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-accent px-4 py-1 text-xs font-semibold text-white">
+            Populairst
+          </div>
+          <div class="text-sm font-medium text-accent">Professional</div>
+          <div class="mt-3 flex items-baseline gap-1">
+            <span class="text-4xl font-bold text-white">&euro;69</span>
+            <span class="text-sm text-gray-500">/maand per gebruiker</span>
+          </div>
+          <ul class="mt-8 space-y-3">
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Alles uit Starter
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              <strong class="text-white">Onbeperkt</strong> relaties
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Aangepaste taak-templates
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Email-notificaties bij deadlines
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Rapportages en exports
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Prioriteit support
+            </li>
+          </ul>
+          <a href="mailto:info@dossierdesk.nl?subject=Gratis proefperiode - Professional" class="mt-8 block rounded-xl bg-accent py-3 text-center text-sm font-semibold text-white transition hover:bg-accent-dark">
+            Start gratis proefperiode
+          </a>
+        </div>
+
+        <!-- Kantoor -->
+        <div class="fade-in rounded-2xl border border-white/5 bg-navy-800/50 p-8 transition card-glow" style="transition-delay: 0.2s">
+          <div class="text-sm font-medium text-gray-400">Kantoor</div>
+          <div class="mt-3 flex items-baseline gap-1">
+            <span class="text-4xl font-bold text-white">&euro;99</span>
+            <span class="text-sm text-gray-500">/maand per gebruiker</span>
+          </div>
+          <ul class="mt-8 space-y-3">
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Alles uit Professional
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Teambeheer en rolverdeling
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Bulk-acties
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Audit trail en compliance logging
+            </li>
+            <li class="flex items-start gap-3 text-sm text-gray-300">
+              <i data-lucide="check" class="mt-0.5 h-4 w-4 shrink-0 text-accent"></i>
+              Dedicated onboarding
+            </li>
+          </ul>
+          <a href="mailto:info@dossierdesk.nl?subject=Kantoor plan - Contact opnemen" class="mt-8 block rounded-xl border border-white/10 py-3 text-center text-sm font-semibold text-white transition hover:border-white/20 hover:bg-white/5">
+            Neem contact op
+          </a>
+        </div>
+      </div>
+
+      <p class="mt-8 text-center text-sm text-gray-500">
+        Alle plannen inclusief 14 dagen gratis uitproberen. Geen creditcard nodig. Maandelijks opzegbaar.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="py-20 md:py-28">
+    <div class="mx-auto max-w-3xl px-6">
+      <div class="text-center">
+        <h2 class="text-3xl font-bold text-white md:text-4xl">Veelgestelde vragen</h2>
+      </div>
+
+      <div class="mt-14 space-y-4">
+        <details class="group rounded-2xl border border-white/5 bg-navy-800/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-white">
+            Is mijn data veilig?
+            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
+          </summary>
+          <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
+            Ja. DossierDesk draait op beveiligde Europese servers met AES-256 encryptie. Wij zijn AVG-compliant en jouw data blijft altijd van jou.
+          </div>
+        </details>
+
+        <details class="group rounded-2xl border border-white/5 bg-navy-800/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-white">
+            Kan ik mijn bestaande klantgegevens importeren?
+            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
+          </summary>
+          <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
+            Ja. Je kunt klanten, entiteiten en contactpersonen importeren via CSV. Wij helpen je gratis bij de eerste import.
+          </div>
+        </details>
+
+        <details class="group rounded-2xl border border-white/5 bg-navy-800/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-white">
+            Werkt DossierDesk met mijn boekhoudpakket?
+            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
+          </summary>
+          <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
+            Koppelingen met Exact Online, Twinfield en andere pakketten staan op de roadmap. Heb je een specifieke wens? Laat het ons weten.
+          </div>
+        </details>
+
+        <details class="group rounded-2xl border border-white/5 bg-navy-800/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-white">
+            Hoeveel medewerkers kunnen er in?
+            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
+          </summary>
+          <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
+            Zoveel als je wilt. Je betaalt per gebruiker per maand.
+          </div>
+        </details>
+
+        <details class="group rounded-2xl border border-white/5 bg-navy-800/50">
+          <summary class="flex cursor-pointer items-center justify-between px-6 py-5 text-sm font-medium text-white">
+            Kan ik het eerst uitproberen?
+            <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
+          </summary>
+          <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
+            Absoluut. Start een gratis proefperiode van 14 dagen. Geen creditcard nodig, geen verplichtingen.
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="py-20 md:py-28">
+    <div class="mx-auto max-w-3xl px-6 text-center">
+      <h2 class="text-3xl font-bold text-white md:text-4xl">
+        Klaar om grip te krijgen<br />op je praktijk?
+      </h2>
+      <p class="mt-4 text-lg text-gray-400">
+        Start vandaag nog met DossierDesk. 14 dagen gratis, geen creditcard nodig.
+      </p>
+      <a href="mailto:info@dossierdesk.nl?subject=Gratis proefperiode starten" class="mt-8 inline-flex items-center gap-2 rounded-xl bg-accent px-8 py-4 text-base font-semibold text-white shadow-lg shadow-accent/20 transition hover:bg-accent-dark hover:shadow-accent/30">
+        Start gratis proefperiode
+        <i data-lucide="arrow-right" class="h-4 w-4"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-12">
+    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 md:flex-row">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-accent text-white">
+          <i data-lucide="folder-open" class="h-3.5 w-3.5"></i>
+        </div>
+        <span class="text-sm font-semibold text-white">DossierDesk</span>
+      </div>
+      <nav class="flex gap-8">
+        <a href="#features" class="text-xs text-gray-500 transition hover:text-gray-300">Features</a>
+        <a href="#pricing" class="text-xs text-gray-500 transition hover:text-gray-300">Prijzen</a>
+        <a href="#faq" class="text-xs text-gray-500 transition hover:text-gray-300">FAQ</a>
+        <a href="mailto:info@dossierdesk.nl" class="text-xs text-gray-500 transition hover:text-gray-300">Contact</a>
+      </nav>
+      <p class="text-xs text-gray-600">&copy; 2025 DossierDesk. Alle rechten voorbehouden.</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Fade-in on scroll
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+    document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
+
+    // Sticky header background on scroll
+    const header = document.getElementById('header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) {
+        header.classList.add('border-white/10');
+        header.classList.remove('border-white/5');
+      } else {
+        header.classList.remove('border-white/10');
+        header.classList.add('border-white/5');
+      }
+    });
+  </script>
+</body>
+</html>
