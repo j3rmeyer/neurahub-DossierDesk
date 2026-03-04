@@ -51,6 +51,10 @@
     .tree-line {
       border-left: 2px solid #334155;
     }
+    .hero-img {
+      mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+      -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+    }
   </style>
 </head>
 <body class="bg-navy-900 text-gray-300 antialiased">
@@ -104,54 +108,15 @@
       </div>
     </div>
 
-    <!-- Abstract dashboard mockup -->
+    <!-- Hero image -->
     <div class="mx-auto mt-16 max-w-5xl px-6">
-      <div class="rounded-2xl border border-white/10 bg-navy-800/60 p-1 shadow-2xl backdrop-blur">
-        <div class="rounded-xl bg-navy-800 p-6">
-          <!-- Mock top bar -->
-          <div class="mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="h-3 w-3 rounded-full bg-red-500/60"></div>
-              <div class="h-3 w-3 rounded-full bg-yellow-500/60"></div>
-              <div class="h-3 w-3 rounded-full bg-green-500/60"></div>
-            </div>
-            <div class="h-6 w-48 rounded bg-navy-700"></div>
-            <div class="h-6 w-6 rounded bg-navy-700"></div>
-          </div>
-          <!-- Mock content -->
-          <div class="flex gap-4">
-            <!-- Sidebar -->
-            <div class="hidden w-44 space-y-2 sm:block">
-              <div class="h-8 rounded bg-accent/10 border border-accent/20"></div>
-              <div class="h-7 rounded bg-navy-700"></div>
-              <div class="h-7 rounded bg-navy-700"></div>
-              <div class="h-7 rounded bg-navy-700"></div>
-              <div class="h-7 rounded bg-navy-700"></div>
-            </div>
-            <!-- Main -->
-            <div class="flex-1 space-y-3">
-              <div class="flex gap-3">
-                <div class="h-20 flex-1 rounded-lg bg-accent/10 border border-accent/20"></div>
-                <div class="h-20 flex-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20"></div>
-                <div class="h-20 flex-1 rounded-lg bg-red-500/10 border border-red-500/20"></div>
-              </div>
-              <div class="grid grid-cols-4 gap-2">
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-accent/20"></div>
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-accent/20"></div>
-                <div class="h-10 rounded bg-accent/20"></div>
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-yellow-500/20"></div>
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-accent/20"></div>
-                <div class="h-10 rounded bg-navy-700"></div>
-                <div class="h-10 rounded bg-red-500/20"></div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="rounded-2xl border border-white/10 bg-navy-800/60 p-1 shadow-2xl backdrop-blur overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=1200&q=80&auto=format&fit=crop"
+          alt="Dashboard overzicht met analytics en grafieken"
+          class="rounded-xl w-full h-auto hero-img"
+          loading="eager"
+        />
       </div>
     </div>
   </section>
@@ -209,7 +174,7 @@
       </div>
 
       <div class="mt-16 space-y-20">
-        <!-- Feature 1 -->
+        <!-- Feature 1: Relatiebeheer -->
         <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
           <div class="flex-1">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
@@ -221,32 +186,17 @@
               Organiseer klanten met hun holdings, werkmaatschappijen en contactpersonen in een overzichtelijke boomstructuur. Alle klantgegevens, KvK, BTW-nummers en contactpersonen op één plek.
             </p>
           </div>
-          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
-            <div class="space-y-3">
-              <div class="flex items-center gap-3 rounded-lg bg-navy-700/50 px-4 py-3">
-                <i data-lucide="building-2" class="h-4 w-4 text-accent"></i>
-                <span class="text-sm font-medium text-white">Meyer Holding</span>
-                <span class="ml-auto rounded bg-accent/10 px-2 py-0.5 text-[10px] font-medium text-accent">Zakelijk</span>
-              </div>
-              <div class="ml-6 space-y-2">
-                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
-                  <i data-lucide="building" class="h-3.5 w-3.5 text-blue-400"></i>
-                  <span class="text-xs text-gray-300">MeyerIT Holding BV</span>
-                </div>
-                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
-                  <i data-lucide="building" class="h-3.5 w-3.5 text-blue-400"></i>
-                  <span class="text-xs text-gray-300">MeyerIT BV</span>
-                </div>
-                <div class="flex items-center gap-3 rounded-lg bg-navy-700/30 px-4 py-2.5">
-                  <i data-lucide="user" class="h-3.5 w-3.5 text-purple-400"></i>
-                  <span class="text-xs text-gray-300">Jerry Meyer</span>
-                </div>
-              </div>
-            </div>
+          <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=600&q=80&auto=format&fit=crop"
+              alt="Gestructureerd relatiebeheer met overzichtelijke organisatie"
+              class="w-full h-56 object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
 
-        <!-- Feature 2 -->
+        <!-- Feature 2: Takenbeheer -->
         <div class="fade-in flex flex-col items-center gap-10 md:flex-row-reverse">
           <div class="flex-1">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400">
@@ -258,38 +208,17 @@
               Kanban-board of lijstweergave — jij kiest. Statussen: Niet gestart, In behandeling, Wacht op klant, Afgerond. Drag en drop om taken te verplaatsen. Elke taak gekoppeld aan de juiste entiteit.
             </p>
           </div>
-          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
-            <div class="flex gap-3">
-              <div class="flex-1 space-y-2">
-                <div class="text-[10px] font-semibold uppercase tracking-wider text-gray-500">Open</div>
-                <div class="rounded-lg border border-white/5 bg-navy-700/50 p-3">
-                  <div class="text-xs font-medium text-white">BTW Q2</div>
-                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
-                </div>
-                <div class="rounded-lg border border-white/5 bg-navy-700/50 p-3">
-                  <div class="text-xs font-medium text-white">VPB 2025</div>
-                  <div class="mt-1 text-[10px] text-gray-500">Holding BV</div>
-                </div>
-              </div>
-              <div class="flex-1 space-y-2">
-                <div class="text-[10px] font-semibold uppercase tracking-wider text-amber-500">Bezig</div>
-                <div class="rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-                  <div class="text-xs font-medium text-white">Jaarrekening</div>
-                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
-                </div>
-              </div>
-              <div class="flex-1 space-y-2">
-                <div class="text-[10px] font-semibold uppercase tracking-wider text-accent">Klaar</div>
-                <div class="rounded-lg border border-accent/20 bg-accent/5 p-3">
-                  <div class="text-xs font-medium text-white">BTW Q1</div>
-                  <div class="mt-1 text-[10px] text-gray-500">MeyerIT BV</div>
-                </div>
-              </div>
-            </div>
+          <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=600&q=80&auto=format&fit=crop"
+              alt="Kanban board met taken en statussen"
+              class="w-full h-56 object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
 
-        <!-- Feature 3 -->
+        <!-- Feature 3: Templates -->
         <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
           <div class="flex-1">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-purple-500/10 px-3 py-1 text-xs font-medium text-purple-400">
@@ -301,38 +230,17 @@
               Nieuwe BV aangemaakt? Alle taken staan er direct: BTW (4x), jaarrekening, VPB, loonheffing. Templates voor BV, Holding, Eenmanszaak, Particulier. Pas aan naar jouw werkwijze.
             </p>
           </div>
-          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
-            <div class="mb-3 text-xs font-medium text-gray-400">Template: Standaard BV</div>
-            <div class="space-y-2">
-              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
-                <div class="h-2 w-2 rounded-full bg-blue-400"></div>
-                <span class="text-xs text-gray-300">BTW Q1-Q4</span>
-                <span class="ml-auto text-[10px] text-gray-500">4 taken</span>
-              </div>
-              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
-                <div class="h-2 w-2 rounded-full bg-purple-400"></div>
-                <span class="text-xs text-gray-300">Jaarrekening</span>
-                <span class="ml-auto text-[10px] text-gray-500">1 taak</span>
-              </div>
-              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
-                <div class="h-2 w-2 rounded-full bg-amber-400"></div>
-                <span class="text-xs text-gray-300">VPB-aangifte</span>
-                <span class="ml-auto text-[10px] text-gray-500">1 taak</span>
-              </div>
-              <div class="flex items-center gap-2 rounded bg-navy-700/40 px-3 py-2">
-                <div class="h-2 w-2 rounded-full bg-pink-400"></div>
-                <span class="text-xs text-gray-300">Loonheffing jan-dec</span>
-                <span class="ml-auto text-[10px] text-gray-500">12 taken</span>
-              </div>
-            </div>
-            <div class="mt-3 flex items-center gap-1 text-[10px] text-accent">
-              <i data-lucide="zap" class="h-3 w-3"></i>
-              18 taken automatisch aangemaakt
-            </div>
+          <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=600&q=80&auto=format&fit=crop"
+              alt="Geautomatiseerde templates en workflows"
+              class="w-full h-56 object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
 
-        <!-- Feature 4 -->
+        <!-- Feature 4: Dashboard -->
         <div class="fade-in flex flex-col items-center gap-10 md:flex-row-reverse">
           <div class="flex-1">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-400">
@@ -344,45 +252,17 @@
               Eén scherm met alles wat aandacht nodig heeft. Kleurcodering: groen (op schema), oranje (deze week), rood (achterstallig). Filter per categorie. Nooit meer een deadline missen.
             </p>
           </div>
-          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
-            <div class="grid grid-cols-3 gap-3">
-              <div class="rounded-lg bg-accent/10 p-3 text-center">
-                <div class="text-2xl font-bold text-accent">24</div>
-                <div class="text-[10px] text-gray-400">Op schema</div>
-              </div>
-              <div class="rounded-lg bg-yellow-500/10 p-3 text-center">
-                <div class="text-2xl font-bold text-yellow-400">7</div>
-                <div class="text-[10px] text-gray-400">Deze week</div>
-              </div>
-              <div class="rounded-lg bg-red-500/10 p-3 text-center">
-                <div class="text-2xl font-bold text-red-400">2</div>
-                <div class="text-[10px] text-gray-400">Achterstallig</div>
-              </div>
-            </div>
-            <div class="mt-4 space-y-2">
-              <div class="flex items-center gap-2 text-xs">
-                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
-                  <div class="h-1.5 w-3/4 rounded-full bg-accent"></div>
-                </div>
-                <span class="text-gray-400">BTW 75%</span>
-              </div>
-              <div class="flex items-center gap-2 text-xs">
-                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
-                  <div class="h-1.5 w-1/2 rounded-full bg-yellow-400"></div>
-                </div>
-                <span class="text-gray-400">VPB 50%</span>
-              </div>
-              <div class="flex items-center gap-2 text-xs">
-                <div class="h-1.5 flex-1 rounded-full bg-navy-700">
-                  <div class="h-1.5 w-1/3 rounded-full bg-purple-400"></div>
-                </div>
-                <span class="text-gray-400">Jaarrekening 33%</span>
-              </div>
-            </div>
+          <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&q=80&auto=format&fit=crop"
+              alt="Dashboard met real-time deadline overzicht en grafieken"
+              class="w-full h-56 object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
 
-        <!-- Feature 5 -->
+        <!-- Feature 5: Audit trail -->
         <div class="fade-in flex flex-col items-center gap-10 md:flex-row">
           <div class="flex-1">
             <div class="mb-4 inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-medium text-cyan-400">
@@ -391,40 +271,16 @@
             </div>
             <h3 class="text-2xl font-bold text-white">Compleet logboek</h3>
             <p class="mt-3 leading-relaxed text-gray-400">
-              Wie heeft wanneer wat gedaan? Automatisch vastgelegd. Statuswijzigingen, notities, toewijzingen — alles traceerbaar.
+              Wie heeft wanneer wat gedaan? Automatisch vastgelegd. Statuswijzigingen, notities, toewijzigingen — alles traceerbaar.
             </p>
           </div>
-          <div class="w-full max-w-sm rounded-2xl border border-white/5 bg-navy-800/50 p-6">
-            <div class="space-y-4">
-              <div class="flex gap-3">
-                <div class="mt-0.5 h-2 w-2 rounded-full bg-accent"></div>
-                <div>
-                  <div class="text-xs text-white">Status gewijzigd naar <span class="font-medium text-accent">Afgerond</span></div>
-                  <div class="text-[10px] text-gray-500">Jerry Meyer &middot; vandaag 14:32</div>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <div class="mt-0.5 h-2 w-2 rounded-full bg-amber-400"></div>
-                <div>
-                  <div class="text-xs text-white">Toegewezen aan <span class="font-medium text-amber-400">Lisa de Vries</span></div>
-                  <div class="text-[10px] text-gray-500">Jerry Meyer &middot; vandaag 10:15</div>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <div class="mt-0.5 h-2 w-2 rounded-full bg-blue-400"></div>
-                <div>
-                  <div class="text-xs text-white">Status gewijzigd naar <span class="font-medium text-blue-400">In behandeling</span></div>
-                  <div class="text-[10px] text-gray-500">Lisa de Vries &middot; gisteren 16:45</div>
-                </div>
-              </div>
-              <div class="flex gap-3">
-                <div class="mt-0.5 h-2 w-2 rounded-full bg-gray-500"></div>
-                <div>
-                  <div class="text-xs text-white">Taak aangemaakt via template</div>
-                  <div class="text-[10px] text-gray-500">Systeem &middot; 15 jan 2025</div>
-                </div>
-              </div>
-            </div>
+          <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 shadow-xl">
+            <img
+              src="https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=600&q=80&auto=format&fit=crop"
+              alt="Gedetailleerd logboek en audit trail"
+              class="w-full h-56 object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>
@@ -448,7 +304,7 @@
             <i data-lucide="building-2" class="h-5 w-5"></i>
           </div>
           <div>
-            <div class="text-base font-semibold text-white">Meyer Holding</div>
+            <div class="text-base font-semibold text-white">Van Dongen Groep</div>
             <div class="text-xs text-gray-500">Zakelijk &middot; 4 entiteiten &middot; 22 taken</div>
           </div>
         </div>
@@ -458,7 +314,7 @@
           <div class="tree-line pl-6">
             <div class="flex items-center gap-3 mb-2">
               <i data-lucide="building" class="h-4 w-4 text-blue-400"></i>
-              <span class="text-sm font-medium text-white">MeyerIT Holding BV</span>
+              <span class="text-sm font-medium text-white">Van Dongen Holding BV</span>
               <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Holding</span>
             </div>
             <div class="ml-7 flex flex-wrap gap-2">
@@ -472,7 +328,7 @@
           <div class="tree-line pl-6">
             <div class="flex items-center gap-3 mb-2">
               <i data-lucide="building" class="h-4 w-4 text-blue-400"></i>
-              <span class="text-sm font-medium text-white">MeyerIT BV</span>
+              <span class="text-sm font-medium text-white">Van Dongen Bouw BV</span>
               <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Werkmaatschappij</span>
             </div>
             <div class="ml-7 flex flex-wrap gap-2">
@@ -487,7 +343,7 @@
           <div class="tree-line pl-6">
             <div class="flex items-center gap-3 mb-2">
               <i data-lucide="user" class="h-4 w-4 text-purple-400"></i>
-              <span class="text-sm font-medium text-white">Jerry Meyer</span>
+              <span class="text-sm font-medium text-white">Thomas van Dongen</span>
               <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Eigenaar</span>
             </div>
             <div class="ml-7 flex flex-wrap gap-2">
@@ -499,13 +355,40 @@
           <div class="pl-6">
             <div class="flex items-center gap-3 mb-2">
               <i data-lucide="user" class="h-4 w-4 text-purple-400"></i>
-              <span class="text-sm font-medium text-white">Partner Meyer</span>
+              <span class="text-sm font-medium text-white">Linda van Dongen</span>
               <span class="rounded bg-navy-700 px-2 py-0.5 text-[10px] text-gray-400">Partner</span>
             </div>
             <div class="ml-7 flex flex-wrap gap-2">
               <span class="rounded border border-emerald-500/20 bg-emerald-500/5 px-2 py-1 text-[10px] text-emerald-400">IB-aangifte 2025</span>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Social proof / Trust -->
+  <section class="py-16">
+    <div class="mx-auto max-w-4xl px-6">
+      <div class="flex flex-col items-center justify-center gap-8 md:flex-row md:gap-16">
+        <div class="text-center">
+          <div class="text-3xl font-bold text-white">99.9%</div>
+          <div class="mt-1 text-sm text-gray-500">Uptime garantie</div>
+        </div>
+        <div class="hidden h-8 w-px bg-white/10 md:block"></div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-white">SOC 2</div>
+          <div class="mt-1 text-sm text-gray-500">Compliant hosting</div>
+        </div>
+        <div class="hidden h-8 w-px bg-white/10 md:block"></div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-white">AVG</div>
+          <div class="mt-1 text-sm text-gray-500">Volledig compliant</div>
+        </div>
+        <div class="hidden h-8 w-px bg-white/10 md:block"></div>
+        <div class="text-center">
+          <div class="text-3xl font-bold text-white">EU</div>
+          <div class="mt-1 text-sm text-gray-500">Data in Europa</div>
         </div>
       </div>
     </div>
@@ -654,7 +537,7 @@
             <i data-lucide="chevron-down" class="h-4 w-4 text-gray-500 transition group-open:rotate-180"></i>
           </summary>
           <div class="px-6 pb-5 text-sm leading-relaxed text-gray-400">
-            Ja. DossierDesk draait op beveiligde Europese servers met AES-256 encryptie. Wij zijn AVG-compliant en jouw data blijft altijd van jou.
+            Absoluut. DossierDesk draait op <strong class="text-gray-300">Railway</strong>, een SOC 2 Type II gecertificeerd platform met continue monitoring en encryptie-at-rest. Onze infrastructuur is AVG-compliant en data wordt opgeslagen binnen de EU. Meer informatie over de beveiliging van ons hostingplatform vind je op <a href="https://trust.railway.com" target="_blank" rel="noopener" class="text-accent hover:text-accent-light transition underline">trust.railway.com</a> en <a href="https://docs.railway.com/enterprise/compliance" target="_blank" rel="noopener" class="text-accent hover:text-accent-light transition underline">Railway Compliance</a>.
           </div>
         </details>
 

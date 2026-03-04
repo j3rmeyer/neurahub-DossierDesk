@@ -2,7 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, LogOut, Search } from "lucide-react";
+import { ChevronRight, LogOut, Moon, Search, Sun } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
@@ -28,6 +29,7 @@ interface TopbarProps {
 export function Topbar({ userName }: TopbarProps) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
+  const { theme, setTheme } = useTheme();
 
   const initials = userName
     ? userName
@@ -78,6 +80,15 @@ export function Topbar({ userName }: TopbarProps) {
             className="w-64 pl-9"
           />
         </div>
+
+        {/* Theme toggle */}
+        <button
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+        >
+          <Sun className="h-4 w-4 rotate-0 scale-100 transition-transform dark:rotate-90 dark:scale-0" />
+          <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-transform dark:rotate-0 dark:scale-100" />
+        </button>
 
         {/* User menu */}
         <DropdownMenu>
