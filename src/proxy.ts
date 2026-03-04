@@ -1,30 +1,33 @@
-import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { auth0 } from "@/lib/auth0";
 
-const PUBLIC_PATHS = ["/login", "/api/auth"];
+export default async function proxy(request: NextRequest) {
+  // Let Auth0 handle its own routes (/auth/login, /auth/callback, /auth/logout)
+  const authResponse = await auth0.middleware(request);
 
-export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Allow public paths
-  if (PUBLIC_PATHS.some((path) => pathname.startsWith(path))) {
-    return NextResponse.next();
-  }
-
-  // Allow static assets
+  // Allow Auth0 routes and static assets to pass through
   if (
+    pathname.startsWith("/auth") ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
     pathname.includes(".")
   ) {
-    return NextResponse.next();
+    return authResponse;
   }
 
-  // Check for session cookie
-  const session = request.cookies.get("dd-session");
+  // Protect all other routes: check for session
+  const session = await auth0.getSession(request);
   if (!session) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(
+      new URL(
+        `/auth/login?returnTo=${encodeURIComponent(pathname)}`,
+        request.url
+      )
+    );
   }
 
-  return NextResponse.next();
+  return authResponse;
 }

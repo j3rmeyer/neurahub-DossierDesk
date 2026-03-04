@@ -17,11 +17,26 @@ const BREADCRUMB_LABELS: Record<string, string> = {
   templates: "Sjablonen",
   entities: "Entiteiten",
   settings: "Instellingen",
+  taken: "Taken",
+  import: "Importeren",
 };
 
-export function Topbar() {
+interface TopbarProps {
+  userName?: string;
+}
+
+export function Topbar({ userName }: TopbarProps) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
+
+  const initials = userName
+    ? userName
+        .split(" ")
+        .map((w) => w[0])
+        .join("")
+        .toUpperCase()
+        .slice(0, 2)
+    : "?";
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
@@ -68,18 +83,15 @@ export function Topbar() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
-              TG
+              {initials}
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={async () => {
-                await fetch("/api/auth/logout", { method: "POST" });
-                window.location.href = "/login";
-              }}
-            >
-              <LogOut className="mr-2 h-4 w-4" />
-              Uitloggen
+            <DropdownMenuItem asChild>
+              <a href="/auth/logout">
+                <LogOut className="mr-2 h-4 w-4" />
+                Uitloggen
+              </a>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

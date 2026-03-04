@@ -87,21 +87,18 @@ export async function POST(request: Request) {
     );
   }
 
-  // For v1, use a default tenant or find existing
-  let tenant = await prisma.tenant.findFirst();
-  if (!tenant) {
-    tenant = await prisma.tenant.create({
-      data: {
-        name: "Mijn Kantoor",
-        slug: "mijn-kantoor",
-      },
-    });
+  const tenantId = session.tenantId;
+  if (!tenantId) {
+    return NextResponse.json(
+      { error: "Geen tenant gevonden" },
+      { status: 400 }
+    );
   }
 
   const client = await prisma.client.create({
     data: {
       ...parsed.data,
-      tenantId: tenant.id,
+      tenantId,
     },
     include: {
       _count: {

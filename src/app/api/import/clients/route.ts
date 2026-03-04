@@ -35,9 +35,8 @@ export async function POST(request: Request) {
     );
   }
 
-  // Get tenant ID from first tenant (simple auth)
-  const tenant = await prisma.tenant.findFirst();
-  if (!tenant) {
+  const tenantId = session.tenantId;
+  if (!tenantId) {
     return NextResponse.json(
       { error: "Geen tenant gevonden" },
       { status: 400 }
@@ -48,7 +47,7 @@ export async function POST(request: Request) {
     parsed.data.clients.map((client) =>
       prisma.client.create({
         data: {
-          tenantId: tenant.id,
+          tenantId,
           name: client.name,
           type: client.type as "PARTICULIER" | "ZAKELIJK",
           email: client.email || null,
