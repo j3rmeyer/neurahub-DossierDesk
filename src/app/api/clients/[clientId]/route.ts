@@ -82,7 +82,7 @@ export async function PUT(
   return NextResponse.json(client);
 }
 
-// DELETE /api/clients/:id - Soft delete client
+// DELETE /api/clients/:id - Hard delete client (cascades to entities, contacts, tasks)
 export async function DELETE(
   _request: Request,
   { params }: { params: Promise<{ clientId: string }> }
@@ -94,9 +94,8 @@ export async function DELETE(
 
   const { clientId } = await params;
 
-  await prisma.client.update({
+  await prisma.client.delete({
     where: { id: clientId },
-    data: { status: "INACTIEF" },
   });
 
   return NextResponse.json({ success: true });

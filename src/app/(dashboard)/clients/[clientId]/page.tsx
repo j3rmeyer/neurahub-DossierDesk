@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import {
   Building2,
   Mail,
@@ -41,7 +41,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-import { useClient, useUpdateClient } from "@/hooks/use-clients";
+import { useClient, useUpdateClient, useDeleteClient } from "@/hooks/use-clients";
 import {
   useCreateContact,
   useUpdateContact,
@@ -96,10 +96,12 @@ interface EntityData {
 }
 
 export default function ClientDetailPage() {
+  const router = useRouter();
   const { clientId } = useParams<{ clientId: string }>();
   const { data: client, isLoading } = useClient(clientId);
   const queryClient = useQueryClient();
   const updateClient = useUpdateClient();
+  const deleteClient = useDeleteClient();
   const createContact = useCreateContact(clientId);
   const updateContact = useUpdateContact(clientId);
   const deleteContact = useDeleteContact(clientId);
@@ -118,8 +120,19 @@ export default function ClientDetailPage() {
   const [entityFormOpen, setEntityFormOpen] = useState(false);
   const [editingEntity, setEditingEntity] = useState<EntityData | null>(null);
   const [deletingEntityId, setDeletingEntityId] = useState<string | null>(null);
+  const [deletingClient, setDeletingClient] = useState(false);
 
   // --- Client handlers ---
+  async function handleDeleteClient() {
+    try {
+      await deleteClient.mutateAsync(clientId);
+      toast.success("Relatie verwijderd");
+      router.push("/clients");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Fout bij verwijderen");
+    }
+  }
+
   async function handleUpdateClient(data: Record<string, string>) {
     try {
       await updateClient.mutateAsync({ id: clientId, ...data });
@@ -329,10 +342,15 @@ export default function ClientDetailPage() {
             </Badge>
           </div>
         </div>
-        <Button variant="outline" onClick={() => setEditOpen(true)}>
-          <Pencil className="mr-2 h-4 w-4" />
-          Bewerken
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => setEditOpen(true)}>
+            <Pencil className="mr-2 h-4 w-4" />
+            Bewerken
+          </Button>
+          <Button variant="outline" size="icon" className="text-destructive hover:bg-destructive hover:text-destructive-foreground" onClick={() => setDeletingClient(true)}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
 
       {/* Client info */}
@@ -757,6 +775,32 @@ export default function ClientDetailPage() {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Verwijderen
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete client */}
+      <AlertDialog
+        open={deletingClient}
+        onOpenChange={setDeletingClient}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Relatie verwijderen</AlertDialogTitle>
+            <AlertDialogDescription>
+              Weet je zeker dat je &quot;{client?.name}&quot; wilt verwijderen?
+              Alle entiteiten, contactpersonen en taken worden permanent verwijderd.
+              Dit kan niet ongedaan worden gemaakt.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Annuleren</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteClient}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Definitief verwijderen
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
